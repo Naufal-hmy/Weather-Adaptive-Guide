@@ -8,15 +8,18 @@ import InputLabel from '@/Components/InputLabel.vue';
 
 const props = defineProps({
     destinations: Array,
+    cities: Array
 });
 
 const form = useForm({
     name: '',
     description: '',
     category: 'outdoor',
-    city: '',
+    city_id: '',
     image_url: '',
     image_file: null,
+    opening_hours: '08:00 - 17:00',
+    rating: 4.0,
     min_temp: '',
     max_temp: '',
 });
@@ -51,8 +54,10 @@ const editDestination = (dest) => {
     form.name = dest.name;
     form.description = dest.description;
     form.category = dest.category;
-    form.city = dest.city;
+    form.city_id = dest.city_id;
     form.image_url = dest.image_url;
+    form.opening_hours = dest.opening_hours;
+    form.rating = dest.rating;
     form.min_temp = dest.min_temp ?? '';
     form.max_temp = dest.max_temp ?? '';
     form.image_file = null;
@@ -106,8 +111,11 @@ const resetForm = () => {
                             </div>
 
                             <div>
-                                <InputLabel for="city" value="Kota" class="text-xs font-semibold text-slate-600 uppercase tracking-wider" />
-                                <TextInput id="city" v-model="form.city" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-3.5 text-sm" placeholder="Contoh: Jakarta, Bali" required />
+                                <InputLabel for="city_id" value="Kota Tujuan" class="text-xs font-semibold text-slate-600 uppercase tracking-wider" />
+                                <select id="city_id" v-model="form.city_id" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-3 text-sm shadow-sm" required>
+                                    <option value="" disabled>Pilih Kota</option>
+                                    <option v-for="city in props.cities" :key="city.id" :value="city.id">{{ city.name }}</option>
+                                </select>
                             </div>
 
                             <div>
@@ -116,6 +124,17 @@ const resetForm = () => {
                                     <option value="outdoor">Outdoor (Luar Ruangan)</option>
                                     <option value="indoor">Indoor (Dalam Ruangan)</option>
                                 </select>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <div class="w-1/2">
+                                    <InputLabel for="rating" value="Rating (0 - 5.0)" class="text-xs font-semibold text-slate-600 uppercase tracking-wider" />
+                                    <TextInput id="rating" v-model="form.rating" type="number" step="0.1" min="0" max="5" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-3 text-sm" required />
+                                </div>
+                                <div class="w-1/2">
+                                    <InputLabel for="opening_hours" value="Jam Buka" class="text-xs font-semibold text-slate-600 uppercase tracking-wider" />
+                                    <TextInput id="opening_hours" v-model="form.opening_hours" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-3 text-sm" placeholder="08:00 - 17:00" required />
+                                </div>
                             </div>
 
                             <div class="flex gap-4">
@@ -178,13 +197,14 @@ const resetForm = () => {
                                         <th class="px-5 py-3.5 font-semibold">Nama Destinasi</th>
                                         <th class="px-5 py-3.5 font-semibold">Kota</th>
                                         <th class="px-5 py-3.5 font-semibold">Kategori</th>
-                                        <th class="px-5 py-3.5 font-semibold text-right">Aksi</th>
+                                        <th class="px-5 py-3.5 font-semibold">Rating</th>
+                                        <th class="px-5 py-3.5 text-right font-semibold">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
                                     <tr v-for="dest in props.destinations" :key="dest.id" class="hover:bg-slate-50/50 transition-colors">
                                         <td class="px-5 py-4 font-semibold text-slate-900">{{ dest.name }}</td>
-                                        <td class="px-5 py-4 text-slate-600">{{ dest.city }}</td>
+                                        <td class="px-5 py-4 text-slate-600">{{ dest.city?.name }}</td>
                                         <td class="px-5 py-4">
                                             <span :class="[
                                                 'px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wider',
@@ -193,13 +213,14 @@ const resetForm = () => {
                                                 {{ dest.category }}
                                             </span>
                                         </td>
+                                        <td class="px-5 py-4 text-slate-700 font-medium">⭐ {{ dest.rating }}</td>
                                         <td class="px-5 py-4 text-right space-x-3 text-xs">
                                             <button @click="editDestination(dest)" class="text-indigo-600 hover:text-indigo-800 font-semibold hover:underline">Edit</button>
                                             <button @click="deleteDestination(dest.id)" class="text-rose-600 hover:text-rose-800 font-semibold hover:underline">Hapus</button>
                                         </td>
                                     </tr>
                                     <tr v-if="!props.destinations || !props.destinations.length">
-                                        <td colspan="4" class="px-5 py-8 text-center text-slate-400 italic">
+                                        <td colspan="5" class="px-5 py-8 text-center text-slate-400 italic">
                                             Belum ada data destinasi dalam database. Silakan tambahkan destinasi baru.
                                         </td>
                                     </tr>
