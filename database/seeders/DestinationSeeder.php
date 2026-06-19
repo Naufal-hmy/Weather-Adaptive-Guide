@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\City;
+use App\Models\WeatherCondition;
 use App\Models\Destination;
 use Illuminate\Database\Seeder;
 
@@ -9,53 +11,177 @@ class DestinationSeeder extends Seeder
 {
     public function run(): void
     {
+        // 1. Seed Cities
+        $cities = [
+            ['name' => 'Jakarta', 'country' => 'Indonesia'],
+            ['name' => 'Malang', 'country' => 'Indonesia'],
+            ['name' => 'Bandung', 'country' => 'Indonesia'],
+            ['name' => 'Bogor', 'country' => 'Indonesia'],
+        ];
+
+        $cityModels = [];
+        foreach ($cities as $city) {
+            $cityModels[$city['name']] = City::updateOrCreate(['name' => $city['name']], $city);
+        }
+
+        // 2. Seed Default Weather Conditions for each city
+        $weatherData = [
+            'Jakarta' => ['status' => 'Cerah', 'temperature' => 31, 'humidity' => 65, 'wind_speed' => 12],
+            'Malang' => ['status' => 'Hujan', 'temperature' => 22, 'humidity' => 85, 'wind_speed' => 8],
+            'Bandung' => ['status' => 'Berawan', 'temperature' => 24, 'humidity' => 75, 'wind_speed' => 10],
+            'Bogor' => ['status' => 'Hujan', 'temperature' => 23, 'humidity' => 90, 'wind_speed' => 6],
+        ];
+
+        foreach ($weatherData as $cityName => $weather) {
+            $city = $cityModels[$cityName];
+            WeatherCondition::updateOrCreate(
+                ['city_id' => $city->id],
+                [
+                    'status' => $weather['status'],
+                    'temperature' => $weather['temperature'],
+                    'humidity' => $weather['humidity'],
+                    'wind_speed' => $weather['wind_speed'],
+                ]
+            );
+        }
+
+        // 3. Seed Destinations linked via city_id
         $destinations = [
+            // Jakarta
             [
                 'name' => 'Taman Impian Jaya Ancol',
-                'description' => 'A large amusement park and beach area. Best enjoyed in sunny weather.',
+                'description' => 'Taman hiburan pantai yang luas di utara Jakarta. Sangat menyenangkan dikunjungi saat cuaca cerah untuk menikmati pantai dan wahana outdoor.',
                 'category' => 'outdoor',
-                'city' => 'Jakarta',
+                'city_name' => 'Jakarta',
                 'image_url' => 'https://images.unsplash.com/photo-1571439223789-9b936eef67da?q=80&w=600',
+                'opening_hours' => '06:00 - 22:00',
+                'rating' => 4.5,
+                'min_temp' => 20,
+                'max_temp' => 36,
             ],
             [
                 'name' => 'Museum Nasional',
-                'description' => 'The National Museum of Indonesia. A perfect indoor activity for a rainy day.',
+                'description' => 'Museum arkeologi, sejarah, etnografi, dan geografi yang terletak di Jakarta Pusat. Sangat ideal untuk wisata edukasi dalam ruangan saat cuaca hujan.',
                 'category' => 'indoor',
-                'city' => 'Jakarta',
+                'city_name' => 'Jakarta',
                 'image_url' => 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=600',
-            ],
-            [
-                'name' => 'Kebun Raya Bogor',
-                'description' => 'Botanical gardens with diverse plants. Great for walking when the sky is clear.',
-                'category' => 'outdoor',
-                'city' => 'Bogor',
-                'image_url' => 'https://images.unsplash.com/photo-1542314831-c6a42072120e?q=80&w=600',
+                'opening_hours' => '08:00 - 16:00',
+                'rating' => 4.6,
+                'min_temp' => null,
+                'max_temp' => null,
             ],
             [
                 'name' => 'Jakarta Aquarium & Safari',
-                'description' => 'Indoor aquarium inside a shopping mall. Discover marine life comfortably regardless of weather.',
+                'description' => 'Akuarium indoor terbesar di Indonesia, terletak di dalam mall Neo Soho. Menampilkan lebih dari 3.500 spesies satwa akuatik dan non-akuatik.',
                 'category' => 'indoor',
-                'city' => 'Jakarta',
+                'city_name' => 'Jakarta',
                 'image_url' => 'https://images.unsplash.com/photo-1533414488820-b4974ba5a278?q=80&w=600',
+                'opening_hours' => '10:00 - 21:00',
+                'rating' => 4.7,
+                'min_temp' => null,
+                'max_temp' => null,
             ],
             [
-                'name' => 'Dufan (Dunia Fantasi)',
-                'description' => 'Theme park with outdoor rides.',
+                'name' => 'Dunia Fantasi (Dufan)',
+                'description' => 'Pusat hiburan outdoor terbesar di Jakarta dengan berbagai pilihan wahana adrenalin ekstrem maupun santai.',
                 'category' => 'outdoor',
-                'city' => 'Jakarta',
+                'city_name' => 'Jakarta',
                 'image_url' => 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=600',
+                'opening_hours' => '10:00 - 18:00',
+                'rating' => 4.6,
+                'min_temp' => 20,
+                'max_temp' => 35,
+            ],
+            // Malang
+            [
+                'name' => 'Museum Angkut',
+                'description' => 'Museum transportasi modern pertama di Asia Tenggara yang memadukan wisata edukasi dengan pameran mobil antik berskala internasional secara indoor.',
+                'category' => 'indoor',
+                'city_name' => 'Malang',
+                'image_url' => 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=600',
+                'opening_hours' => '12:00 - 20:00',
+                'rating' => 4.8,
+                'min_temp' => null,
+                'max_temp' => null,
             ],
             [
-                'name' => 'Grand Indonesia Mall',
-                'description' => 'One of the largest shopping malls. Full of indoor entertainment, dining, and shopping.',
+                'name' => 'Jatim Park Indoor (Science Center)',
+                'description' => 'Wahana edukasi sains interaktif dalam ruangan yang sangat cocok untuk liburan keluarga saat cuaca dingin atau hujan di Kota Batu/Malang.',
                 'category' => 'indoor',
-                'city' => 'Jakarta',
-                'image_url' => 'https://images.unsplash.com/photo-1519567241046-7f4f03937112?q=80&w=600',
+                'city_name' => 'Malang',
+                'image_url' => 'https://images.unsplash.com/photo-1507208773393-40d9fc670acf?q=80&w=600',
+                'opening_hours' => '08:30 - 16:30',
+                'rating' => 4.5,
+                'min_temp' => null,
+                'max_temp' => null,
+            ],
+            [
+                'name' => 'Gunung Bromo (Jalur Malang)',
+                'description' => 'Destinasi wisata luar ruangan yang legendaris. Menawarkan pemandangan matahari terbit indah dan lautan pasir yang luas saat cuaca cerah.',
+                'category' => 'outdoor',
+                'city_name' => 'Malang',
+                'image_url' => 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?q=80&w=600',
+                'opening_hours' => '24 Jam',
+                'rating' => 4.9,
+                'min_temp' => 5,
+                'max_temp' => 22,
+            ],
+            // Bandung
+            [
+                'name' => 'Kawah Putih Ciwidey',
+                'description' => 'Danau vulkanik yang indah dengan tanah berwarna putih kehijauan. Udara sejuk dan pemandangan menakjubkan saat cerah atau berawan tipis.',
+                'category' => 'outdoor',
+                'city_name' => 'Bandung',
+                'image_url' => 'https://images.unsplash.com/photo-1626125345510-4603468eedfb?q=80&w=600',
+                'opening_hours' => '07:00 - 17:00',
+                'rating' => 4.6,
+                'min_temp' => 10,
+                'max_temp' => 25,
+            ],
+            [
+                'name' => 'Trans Studio Bandung',
+                'description' => 'Salah satu taman bermain indoor terbesar di dunia yang menghadirkan wahana menantang dan pertunjukan spektakuler tanpa takut kehujanan.',
+                'category' => 'indoor',
+                'city_name' => 'Bandung',
+                'image_url' => 'https://images.unsplash.com/photo-1513885041144-809f42633084?q=80&w=600',
+                'opening_hours' => '10:00 - 19:00',
+                'rating' => 4.7,
+                'min_temp' => null,
+                'max_temp' => null,
+            ],
+            // Bogor
+            [
+                'name' => 'Kebun Raya Bogor',
+                'description' => 'Kebun botani tertua di Asia Tenggara. Tempat ideal untuk jalan santai menikmati alam di bawah pohon rindang saat cuaca cerah.',
+                'category' => 'outdoor',
+                'city_name' => 'Bogor',
+                'image_url' => 'https://images.unsplash.com/photo-1542314831-c6a42072120e?q=80&w=600',
+                'opening_hours' => '08:00 - 16:00',
+                'rating' => 4.6,
+                'min_temp' => 18,
+                'max_temp' => 30,
             ]
         ];
 
         foreach ($destinations as $dest) {
-            Destination::create($dest);
+            $city = $cityModels[$dest['city_name']];
+            Destination::create([
+                'city_id' => $city->id,
+                'name' => $dest['name'],
+                'description' => $dest['description'],
+                'category' => $dest['category'],
+                'image_url' => $dest['image_url'],
+                'opening_hours' => $dest['opening_hours'],
+                'rating' => $dest['rating'],
+                'min_temp' => $dest['min_temp'],
+                'max_temp' => $dest['max_temp'],
+            ]);
+        }
+
+        // 4. Generate initial recommendations via agent service
+        $service = app(\App\Services\WeatherAdaptiveGuideService::class);
+        foreach ($cityModels as $city) {
+            $service->getRecommendations($city->id);
         }
     }
 }
