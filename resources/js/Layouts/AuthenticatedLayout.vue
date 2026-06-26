@@ -200,8 +200,8 @@ const showingNavigationDropdown = ref(false);
             </div>
         </nav>
 
-        <!-- Page Heading (Sleek Banner) -->
-        <header class="bg-white border-b border-slate-100 shadow-sm" v-if="$slots.header">
+        <!-- Page Heading -->
+        <header class="bg-transparent" v-if="$slots.header">
             <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 <slot name="header" />
             </div>
