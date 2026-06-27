@@ -14,8 +14,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [GuideController::class, 'index'])
         ->name('dashboard');
 
-    Route::get('/smart-map', [GuideController::class, 'smartMap'])
-        ->name('smart-map');
+
 
     Route::get('/api/nearby-recommendations', [GuideController::class, 'getNearbyRecommendations'])
         ->name('api.nearby-recommendations');

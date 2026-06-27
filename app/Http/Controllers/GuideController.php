@@ -106,19 +106,7 @@ class GuideController extends Controller
         return redirect()->back()->with('success', 'Simulasi cuaca dihentikan. Mengambil data cuaca real-time.');
     }
 
-    /**
-     * Render the Smart Recommendation Map page.
-     */
-    public function smartMap()
-    {
-        $cities = $this->cityRepo->all();
-        $googleMapsApiKey = config('services.google.maps_api_key') ?: '';
 
-        return Inertia::render('SmartMap', [
-            'cities' => $cities,
-            'googleMapsApiKey' => $googleMapsApiKey,
-        ]);
-    }
 
     /**
      * Get nearby recommendations using Google Places API and OpenWeather API

@@ -32,10 +32,7 @@ const { isDark, toggle } = useDarkMode();
                                 class="text-sm font-medium transition-colors duration-200 dark:text-slate-300 dark:hover:text-white">
                                 Dashboard
                             </NavLink>
-                            <NavLink :href="route('smart-map')" :active="route().current('smart-map')"
-                                class="text-sm font-medium transition-colors duration-200 dark:text-slate-300 dark:hover:text-white">
-                                Smart Map
-                            </NavLink>
+
                             <NavLink v-if="$page.props.auth.user?.is_admin"
                                 :href="route('destinations.index')" :active="route().current('destinations.*')"
                                 class="text-sm font-medium transition-colors duration-200 dark:text-slate-300 dark:hover:text-white">
@@ -136,10 +133,7 @@ const { isDark, toggle } = useDarkMode();
                         class="dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800">
                         Dashboard
                     </ResponsiveNavLink>
-                    <ResponsiveNavLink :href="route('smart-map')" :active="route().current('smart-map')"
-                        class="dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800">
-                        Smart Map
-                    </ResponsiveNavLink>
+
                     <ResponsiveNavLink v-if="$page.props.auth.user?.is_admin"
                         :href="route('destinations.index')" :active="route().current('destinations.*')"
                         class="dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800">
