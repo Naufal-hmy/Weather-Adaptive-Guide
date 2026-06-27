@@ -5,15 +5,16 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 import { Link } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50/70 text-slate-900 font-sans antialiased">
+    <div class="min-h-screen bg-slate-50/70 text-slate-900 font-sans antialiased dark:bg-slate-900 dark:text-slate-100">
         <!-- Sticky Premium Header -->
-        <nav class="sticky top-0 z-50 border-b border-slate-100 bg-white/80 backdrop-blur-md transition-all duration-300">
+        <nav class="sticky top-0 z-50 border-b border-slate-100 bg-white/80 backdrop-blur-md transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/80">
             <!-- Primary Navigation Menu -->
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 justify-between items-center">
@@ -47,6 +48,8 @@ const showingNavigationDropdown = ref(false);
 
                     <!-- Right Header (Auth Options) -->
                     <div class="hidden sm:flex sm:items-center sm:ms-6">
+                        <ThemeToggle class="me-2" />
+                        
                         <!-- Settings Dropdown -->
                         <div class="relative ms-3">
                             <Dropdown align="right" width="48">
@@ -54,7 +57,7 @@ const showingNavigationDropdown = ref(false);
                                     <span class="inline-flex rounded-md">
                                         <button
                                             type="button"
-                                            class="inline-flex items-center rounded-xl border border-slate-200/60 bg-white px-4 py-2 text-sm font-medium leading-4 text-slate-700 shadow-sm transition duration-150 ease-in-out hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                            class="inline-flex items-center rounded-xl border border-slate-200/60 bg-white px-4 py-2 text-sm font-medium leading-4 text-slate-700 shadow-sm transition duration-150 ease-in-out hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                                         >
                                             <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
                                             {{ $page.props.auth.user?.name || 'Tamu (Guest)' }}
@@ -106,9 +109,10 @@ const showingNavigationDropdown = ref(false);
 
                     <!-- Hamburger -->
                     <div class="-me-2 flex items-center sm:hidden">
+                        <ThemeToggle class="me-1" />
                         <button
                             @click="showingNavigationDropdown = !showingNavigationDropdown"
-                            class="inline-flex items-center justify-center rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition duration-150 ease-in-out focus:outline-none"
+                            class="inline-flex items-center justify-center rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition duration-150 ease-in-out focus:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                         >
                             <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                                 <path
@@ -143,7 +147,7 @@ const showingNavigationDropdown = ref(false);
                     block: showingNavigationDropdown,
                     hidden: !showingNavigationDropdown,
                 }"
-                class="sm:hidden bg-white border-t border-slate-100 transition-all duration-300"
+                class="sm:hidden bg-white border-t border-slate-100 transition-all duration-300 dark:bg-slate-800 dark:border-slate-700"
             >
                 <div class="space-y-1 pb-3 pt-2">
                     <ResponsiveNavLink
@@ -162,14 +166,14 @@ const showingNavigationDropdown = ref(false);
                 </div>
 
                 <!-- Responsive Settings Options -->
-                <div class="border-t border-slate-100 pb-4 pt-4 bg-slate-50/50">
+                <div class="border-t border-slate-100 pb-4 pt-4 bg-slate-50/50 dark:border-slate-700 dark:bg-slate-900/50">
                     <div class="px-4 flex items-center space-x-2">
                         <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
                         <div>
-                            <div class="text-base font-semibold text-slate-800">
+                            <div class="text-base font-semibold text-slate-800 dark:text-slate-200">
                                 {{ $page.props.auth.user?.name || 'Tamu (Guest)' }}
                             </div>
-                            <div class="text-sm text-slate-500">
+                            <div class="text-sm text-slate-500 dark:text-slate-400">
                                 {{ $page.props.auth.user?.email || 'Akses Terbatas' }}
                             </div>
                         </div>

@@ -302,7 +302,7 @@ watch(() => props.guideData?.city?.name, () => {
             </div>
         </template>
 
-        <div class="py-10 bg-[#F8FAFC] min-h-screen relative">
+        <div class="py-10 bg-[#F8FAFC] dark:bg-slate-950 min-h-screen relative">
             <!-- Decorative Background Elements -->
             <div class="absolute top-0 w-full h-[500px] bg-gradient-to-b from-indigo-50/80 to-transparent pointer-events-none"></div>
             
@@ -315,13 +315,13 @@ watch(() => props.guideData?.city?.name, () => {
                     <div class="lg:col-span-4 space-y-8">
                         
                         <!-- City Selector Card -->
-                        <div class="bg-white/70 backdrop-blur-xl rounded-[2rem] border border-white shadow-xl shadow-slate-200/50 p-8 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-300">
+                        <div class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-[2rem] border border-white dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none p-8 hover:shadow-2xl hover:shadow-slate-200/60 dark:hover:shadow-slate-900/50 transition-all duration-300">
                             <div class="mb-6">
-                                <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                                <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
                                     <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                     Pilih Kota Tujuan
                                 </h3>
-                                <p class="text-sm text-slate-500 mt-1.5 font-medium">Sistem akan menyajikan cuaca hari ini & rekomendasi destinasi otomatis.</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5 font-medium">Sistem akan menyajikan cuaca hari ini & rekomendasi destinasi otomatis.</p>
                             </div>
                             
                             <div class="relative group">
@@ -334,7 +334,7 @@ watch(() => props.guideData?.city?.name, () => {
                                         @blur="handleBlur"
                                         @keyup.enter="onEnter"
                                         placeholder="Cari lokasi tujuan..."
-                                        class="block w-full rounded-2xl border-2 border-slate-100 bg-slate-50/50 text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-0 py-4 pl-5 pr-14 shadow-inner transition-all group-hover:bg-white"
+                                        class="block w-full rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 text-sm font-bold text-slate-700 dark:text-slate-200 focus:border-indigo-500 focus:ring-0 py-4 pl-5 pr-14 shadow-inner transition-all group-hover:bg-white dark:group-hover:bg-slate-800"
                                     />
                                     <button @click="onEnter" class="absolute inset-y-2 right-2 flex items-center justify-center w-10 h-10 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg hover:-translate-y-0.5 duration-200">
                                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -354,14 +354,14 @@ watch(() => props.guideData?.city?.name, () => {
                                 >
                                     <div 
                                         v-if="showSuggestions && filteredCities.length > 0" 
-                                        class="absolute z-50 mt-3 w-full bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-100 shadow-2xl max-h-60 overflow-y-auto py-2"
+                                        class="absolute z-50 mt-3 w-full bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-2xl border border-slate-100 dark:border-slate-700 shadow-2xl max-h-60 overflow-y-auto py-2"
                                     >
                                         <button
                                             v-for="city in filteredCities"
                                             :key="city.id"
                                             type="button"
                                             @mousedown="selectCity(city)"
-                                            class="w-full text-left px-5 py-3.5 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors flex justify-between items-center group/item border-b border-slate-50 last:border-0"
+                                            class="w-full text-left px-5 py-3.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors flex justify-between items-center group/item border-b border-slate-50 dark:border-slate-700/50 last:border-0"
                                         >
                                             <span class="font-bold group-hover/item:translate-x-1 transition-transform">{{ city.name }}, <span class="text-slate-400 group-hover/item:text-indigo-400 font-medium">{{ city.country }}</span></span>
                                             <span v-if="city.id === props.selectedCityId" class="text-indigo-600 text-[10px] font-black bg-indigo-100 px-2.5 py-1 rounded-md uppercase tracking-wider">Aktif</span>
@@ -372,14 +372,14 @@ watch(() => props.guideData?.city?.name, () => {
                         </div>
 
                         <!-- Map Card -->
-                        <div class="bg-white/70 backdrop-blur-xl rounded-[2rem] border border-white shadow-xl shadow-slate-200/50 overflow-hidden hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-300 p-2">
+                        <div class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-[2rem] border border-white dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-slate-200/60 dark:hover:shadow-slate-900/50 transition-all duration-300 p-2">
                             <div class="px-6 pt-5 pb-4 flex items-center justify-between">
-                                <h3 class="text-lg font-black text-slate-800">Peta Interaktif</h3>
-                                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-slate-100">Peta Interaktif</h3>
+                                <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                                 </div>
                             </div>
-                            <div class="relative overflow-hidden rounded-[1.5rem] border-4 border-white shadow-inner bg-slate-100 mx-2 mb-2">
+                            <div class="relative overflow-hidden rounded-[1.5rem] border-4 border-white dark:border-slate-700 shadow-inner bg-slate-100 dark:bg-slate-900 mx-2 mb-2">
                                 <div id="interactive-map" class="w-full h-72 z-10"></div>
                             </div>
                         </div>
@@ -410,25 +410,25 @@ watch(() => props.guideData?.city?.name, () => {
                         <!-- Weather Simulator Card (Admin Only) -->
                         <div 
                             v-if="$page.props.auth.user?.is_admin && selectedCity" 
-                            class="bg-white/70 backdrop-blur-xl rounded-[2rem] border-2 border-rose-100 shadow-xl shadow-rose-100/50 p-8"
+                            class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-[2rem] border-2 border-rose-100 dark:border-rose-900/30 shadow-xl shadow-rose-100/50 dark:shadow-none p-8"
                         >
-                            <div class="flex flex-col mb-6 border-b border-slate-100 pb-5">
+                            <div class="flex flex-col mb-6 border-b border-slate-100 dark:border-slate-700 pb-5">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                                    <h3 class="text-lg font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
                                         <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                                         Weather Simulator
                                     </h3>
-                                    <span class="bg-rose-100 text-rose-700 text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest">Admin</span>
+                                    <span class="bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-400 text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest">Admin</span>
                                 </div>
-                                <p class="text-xs text-slate-500 mt-2 font-medium">Control panel admin untuk simulasi cuaca.</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">Control panel admin untuk simulasi cuaca.</p>
                             </div>
 
                             <form @submit.prevent="submitWeatherSimulation" class="space-y-5">
                                 <div>
-                                    <label class="text-[11px] font-black text-slate-700 uppercase tracking-widest block mb-2">Status Cuaca</label>
+                                    <label class="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest block mb-2">Status Cuaca</label>
                                     <select 
                                         v-model="weatherForm.status"
-                                        class="block w-full rounded-xl border-slate-200 bg-slate-50 text-sm focus:border-rose-500 focus:ring-rose-500 py-3.5 px-4 font-bold text-slate-700"
+                                        class="block w-full rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm focus:border-rose-500 focus:ring-rose-500 py-3.5 px-4 font-bold text-slate-700 dark:text-slate-200"
                                     >
                                         <option value="Cerah">☀️ Cerah</option>
                                         <option value="Berawan">☁️ Berawan</option>
@@ -437,28 +437,28 @@ watch(() => props.guideData?.city?.name, () => {
                                 </div>
 
                                 <div class="grid grid-cols-3 gap-3">
-                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-                                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Suhu (°C)</label>
+                                    <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700 text-center">
+                                        <label class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">Suhu (°C)</label>
                                         <input 
                                             v-model="weatherForm.temperature" 
                                             type="number" 
-                                            class="block w-full rounded-lg border-0 bg-white text-base focus:ring-2 focus:ring-rose-500 py-2 px-2 font-black text-slate-800 text-center shadow-sm"
+                                            class="block w-full rounded-lg border-0 bg-white dark:bg-slate-800 text-base focus:ring-2 focus:ring-rose-500 py-2 px-2 font-black text-slate-800 dark:text-slate-200 text-center shadow-sm"
                                         >
                                     </div>
-                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-                                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Kelembapan</label>
+                                    <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700 text-center">
+                                        <label class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">Kelembapan</label>
                                         <input 
                                             v-model="weatherForm.humidity" 
                                             type="number" 
-                                            class="block w-full rounded-lg border-0 bg-white text-base focus:ring-2 focus:ring-rose-500 py-2 px-2 font-black text-slate-800 text-center shadow-sm"
+                                            class="block w-full rounded-lg border-0 bg-white dark:bg-slate-800 text-base focus:ring-2 focus:ring-rose-500 py-2 px-2 font-black text-slate-800 dark:text-slate-200 text-center shadow-sm"
                                         >
                                     </div>
-                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-                                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Angin</label>
+                                    <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700 text-center">
+                                        <label class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">Angin</label>
                                         <input 
                                             v-model="weatherForm.wind_speed" 
                                             type="number" 
-                                            class="block w-full rounded-lg border-0 bg-white text-base focus:ring-2 focus:ring-rose-500 py-2 px-2 font-black text-slate-800 text-center shadow-sm"
+                                            class="block w-full rounded-lg border-0 bg-white dark:bg-slate-800 text-base focus:ring-2 focus:ring-rose-500 py-2 px-2 font-black text-slate-800 dark:text-slate-200 text-center shadow-sm"
                                         >
                                     </div>
                                 </div>
@@ -478,16 +478,16 @@ watch(() => props.guideData?.city?.name, () => {
                     <div class="lg:col-span-8 space-y-8">
                         
                         <!-- Error Alert -->
-                        <div v-if="props.guideData.is_error" class="bg-white/80 backdrop-blur-md border-l-8 border-rose-500 rounded-2xl p-6 shadow-xl">
+                        <div v-if="props.guideData.is_error" class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-l-8 border-rose-500 rounded-2xl p-6 shadow-xl">
                             <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center shadow-inner">
-                                    <svg class="h-6 w-6 text-rose-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div class="w-12 h-12 bg-rose-100 dark:bg-rose-900/50 rounded-full flex items-center justify-center shadow-inner">
+                                    <svg class="h-6 w-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg font-black text-rose-900">Sistem Mendeteksi Kesalahan</h3>
-                                    <p class="text-sm text-rose-700 mt-1 font-bold">{{ props.guideData.error_message }}</p>
+                                    <h3 class="text-lg font-black text-rose-900 dark:text-rose-400">Sistem Mendeteksi Kesalahan</h3>
+                                    <p class="text-sm text-rose-700 dark:text-rose-300 mt-1 font-bold">{{ props.guideData.error_message }}</p>
                                 </div>
                             </div>
                         </div>
@@ -570,16 +570,16 @@ watch(() => props.guideData?.city?.name, () => {
                             </div>
 
                             <!-- Agent Reasoning Card -->
-                            <div class="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 relative overflow-hidden group hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-300">
-                                <div class="absolute inset-0 bg-gradient-to-r from-indigo-50/50 via-purple-50/30 to-transparent group-hover:opacity-70 transition-opacity"></div>
-                                <div class="relative z-10 flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl p-5 shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform">
+                            <div class="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 relative overflow-hidden group hover:shadow-2xl hover:shadow-indigo-100/50 dark:hover:shadow-indigo-900/20 transition-all duration-300">
+                                <div class="absolute inset-0 bg-gradient-to-r from-indigo-50/50 dark:from-indigo-900/10 via-purple-50/30 dark:via-purple-900/10 to-transparent group-hover:opacity-70 transition-opacity"></div>
+                                <div class="relative z-10 flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl p-5 shadow-lg shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
                                     <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                     </svg>
                                 </div>
                                 <div class="relative z-10 flex-1">
-                                    <h4 class="text-[11px] font-black text-indigo-600 uppercase tracking-widest mb-2 bg-indigo-50 inline-block px-3 py-1 rounded-full">AI Reasoning Insight</h4>
-                                    <p class="text-lg text-slate-700 font-bold leading-relaxed">
+                                    <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2 bg-indigo-50 dark:bg-indigo-900/50 inline-block px-3 py-1 rounded-full">AI Reasoning Insight</h4>
+                                    <p class="text-lg text-slate-700 dark:text-slate-300 font-bold leading-relaxed">
                                         {{ props.guideData.reason }}
                                     </p>
                                 </div>
@@ -589,8 +589,8 @@ watch(() => props.guideData?.city?.name, () => {
                             <div class="space-y-8 pt-6">
                                 <div class="flex items-end justify-between pb-4">
                                     <div>
-                                        <h3 class="text-3xl font-black text-slate-800 tracking-tight">Top Rekomendasi</h3>
-                                        <p class="text-sm text-slate-500 mt-1.5 font-bold">Destinasi terbaik berdasarkan cuaca saat ini</p>
+                                        <h3 class="text-3xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Top Rekomendasi</h3>
+                                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5 font-bold">Destinasi terbaik berdasarkan cuaca saat ini</p>
                                     </div>
                                     <span class="bg-indigo-600 text-white text-sm font-black px-4 py-2 rounded-xl shadow-lg shadow-indigo-200">
                                         {{ props.guideData.destinations?.length || 0 }} Matches
@@ -602,7 +602,7 @@ watch(() => props.guideData?.city?.name, () => {
                                     <div 
                                         v-for="dest in props.guideData.destinations" 
                                         :key="dest.id" 
-                                        class="group bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/60 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full cursor-pointer"
+                                        class="group bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/60 dark:hover:shadow-indigo-900/30 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full cursor-pointer"
                                     >
                                         <!-- Image Header -->
                                         <div class="relative h-64 overflow-hidden bg-slate-100">
@@ -638,17 +638,17 @@ watch(() => props.guideData?.city?.name, () => {
                                         </div>
 
                                         <!-- Content Body -->
-                                        <div class="p-7 flex flex-col justify-between flex-grow bg-white relative">
-                                            <p class="text-sm text-slate-500 line-clamp-3 leading-relaxed mb-6 font-bold">
+                                        <div class="p-7 flex flex-col justify-between flex-grow bg-white dark:bg-slate-800 relative">
+                                            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed mb-6 font-bold">
                                                 {{ dest.description }}
                                             </p>
 
-                                            <div class="flex items-center justify-between text-xs text-slate-600 pt-5 border-t border-slate-100 font-black">
-                                                <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-100">
+                                            <div class="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 pt-5 border-t border-slate-100 dark:border-slate-700 font-black">
+                                                <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-100 dark:border-slate-700">
                                                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                     {{ dest.opening_hours }}
                                                 </div>
-                                                <div class="flex items-center gap-2 bg-indigo-50/50 px-3.5 py-2 rounded-xl text-indigo-700 border border-indigo-100/50">
+                                                <div class="flex items-center gap-2 bg-indigo-50/50 dark:bg-indigo-900/30 px-3.5 py-2 rounded-xl text-indigo-700 dark:text-indigo-400 border border-indigo-100/50 dark:border-indigo-800/50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                                     {{ dest.city?.name }}
                                                 </div>
@@ -658,13 +658,13 @@ watch(() => props.guideData?.city?.name, () => {
                                     
                                     <div 
                                         v-if="!props.guideData.destinations || props.guideData.destinations.length === 0" 
-                                        class="col-span-1 md:col-span-2 flex flex-col items-center justify-center bg-white rounded-[2rem] border-2 border-dashed border-slate-200 p-16 text-center shadow-sm"
+                                        class="col-span-1 md:col-span-2 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-700 p-16 text-center shadow-sm dark:shadow-none"
                                     >
-                                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center shadow-inner mb-5">
-                                            <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <div class="w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center shadow-inner mb-5">
+                                            <svg class="w-10 h-10 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         </div>
-                                        <h3 class="text-xl font-black text-slate-800 mb-2">Tidak Ada Destinasi</h3>
-                                        <p class="text-base text-slate-500 font-bold max-w-sm">Belum ada destinasi yang cocok untuk kategori cuaca saat ini di kota ini.</p>
+                                        <h3 class="text-xl font-black text-slate-800 dark:text-slate-200 mb-2">Tidak Ada Destinasi</h3>
+                                        <p class="text-base text-slate-500 dark:text-slate-400 font-bold max-w-sm">Belum ada destinasi yang cocok untuk kategori cuaca saat ini di kota ini.</p>
                                     </div>
                                 </div>
                             </div>
