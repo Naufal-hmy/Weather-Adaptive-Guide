@@ -232,7 +232,7 @@ watch(() => props.guideData?.city?.name, () => {
             </div>
         </template>
 
-        <div class="py-8 bg-slate-50 dark:bg-slate-950 min-h-screen transition-colors duration-300">
+        <div class="py-8 bg-slate-100 dark:bg-slate-950 min-h-screen transition-colors duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
                 <!-- TOP ROW: City Selector + Stats -->
