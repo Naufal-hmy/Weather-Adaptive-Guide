@@ -60,9 +60,45 @@ const handleBlur = () => {
     }, 200);
 };
 
-const onEnter = () => {
+const onEnter = async () => {
     if (filteredCities.value.length > 0) {
         selectCity(filteredCities.value[0]);
+    } else {
+        const query = searchQuery.value;
+        if (!query) return;
+        
+        isMapLoading.value = true;
+        document.body.style.cursor = 'wait';
+        
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`, {
+                headers: {
+                    'Accept-Language': 'id-ID,id;q=0.9',
+                    'User-Agent': 'AeroWeather/1.0'
+                }
+            });
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                const lat = data[0].lat;
+                const lng = data[0].lon;
+                const name = data[0].name || query;
+                
+                router.get(route('dashboard'), { lat, lng, q: name, date: selectedDate.value, time: selectedTime.value }, { 
+                    preserveState: true,
+                    onFinish: () => { isMapLoading.value = false; document.body.style.cursor = 'default'; }
+                });
+            } else {
+                alert(`Lokasi "${query}" tidak ditemukan.`);
+                isMapLoading.value = false;
+                document.body.style.cursor = 'default';
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Gagal mencari lokasi. Silakan coba lagi.');
+            isMapLoading.value = false;
+            document.body.style.cursor = 'default';
+        }
     }
 };
 

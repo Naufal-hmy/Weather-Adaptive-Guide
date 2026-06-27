@@ -735,12 +735,42 @@ class WeatherAdaptiveGuideService
 
         // Fallback mock data if API fails or is not configured
         if (empty($rawPlaces)) {
-            $fallbackCity = 'Batu';
-            $cityClean = strtolower($locationName);
-            if (str_contains($cityClean, 'jakarta')) $fallbackCity = 'Jakarta';
-            elseif (str_contains($cityClean, 'malang')) $fallbackCity = 'Malang';
-            elseif (str_contains($cityClean, 'bandung')) $fallbackCity = 'Bandung';
-            elseif (str_contains($cityClean, 'bogor')) $fallbackCity = 'Bogor';
+            $mockCities = [
+                'Batu' => [-7.8712, 112.5269],
+                'Jakarta' => [-6.2088, 106.8456],
+                'Malang' => [-7.9839, 112.6214],
+                'Bandung' => [-6.9175, 107.6191],
+                'Bogor' => [-6.5971, 106.8060],
+                'Bali' => [-8.4095, 115.1889],
+                'Yogyakarta' => [-7.7956, 110.3695]
+            ];
+            
+            $fallbackCity = null;
+            $minDistance = 100; // max radius 100km
+            
+            foreach ($mockCities as $cName => $coords) {
+                // Haversine formula
+                $earthRadius = 6371; // km
+                $latFrom = deg2rad($lat);
+                $lonFrom = deg2rad($lng);
+                $latTo = deg2rad($coords[0]);
+                $lonTo = deg2rad($coords[1]);
+
+                $latDelta = $latTo - $latFrom;
+                $lonDelta = $lonTo - $lonFrom;
+
+                $a = sin($latDelta / 2) * sin($latDelta / 2) +
+                    cos($latFrom) * cos($latTo) *
+                    sin($lonDelta / 2) * sin($lonDelta / 2);
+                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                
+                $distance = $earthRadius * $c;
+                
+                if ($distance < $minDistance) {
+                    $minDistance = $distance;
+                    $fallbackCity = $cName;
+                }
+            }
 
             $mockAlternatives = [
                 'Batu' => [
@@ -999,10 +1029,10 @@ class WeatherAdaptiveGuideService
                 ]
             ];
 
-            if (isset($mockAlternatives[$fallbackCity])) {
+            if ($fallbackCity && isset($mockAlternatives[$fallbackCity])) {
                 $rawPlaces = $mockAlternatives[$fallbackCity];
             } else {
-                $rawPlaces = $mockAlternatives['Batu'];
+                $rawPlaces = [];
             }
         }
 
