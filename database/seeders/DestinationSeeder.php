@@ -18,6 +18,8 @@ class DestinationSeeder extends Seeder
             ['name' => 'Malang', 'country' => 'Indonesia'],
             ['name' => 'Bandung', 'country' => 'Indonesia'],
             ['name' => 'Bogor', 'country' => 'Indonesia'],
+            ['name' => 'Bali', 'country' => 'Indonesia'],
+            ['name' => 'Yogyakarta', 'country' => 'Indonesia'],
         ];
 
         $cityModels = [];
@@ -32,6 +34,8 @@ class DestinationSeeder extends Seeder
             'Malang' => ['status' => 'Hujan', 'temperature' => 22, 'humidity' => 85, 'wind_speed' => 8],
             'Bandung' => ['status' => 'Berawan', 'temperature' => 24, 'humidity' => 75, 'wind_speed' => 10],
             'Bogor' => ['status' => 'Hujan', 'temperature' => 23, 'humidity' => 90, 'wind_speed' => 6],
+            'Bali' => ['status' => 'Cerah', 'temperature' => 32, 'humidity' => 60, 'wind_speed' => 15],
+            'Yogyakarta' => ['status' => 'Berawan', 'temperature' => 28, 'humidity' => 70, 'wind_speed' => 9],
         ];
 
         foreach ($weatherData as $cityName => $weather) {

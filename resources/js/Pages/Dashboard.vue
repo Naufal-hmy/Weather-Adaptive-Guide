@@ -85,6 +85,8 @@ const cityCoords = {
     'Malang':  [-7.9839, 112.6214],
     'Bandung': [-6.9175, 107.6191],
     'Bogor':   [-6.5971, 106.8060],
+    'Bali': [-8.4095, 115.1889],
+    'Yogyakarta': [-7.7956, 110.3695]
 };
 
 let map = null;
@@ -104,6 +106,30 @@ const changeCity = () => {
 
 const submitWeatherSimulation = () => {
     weatherForm.post(route('admin.weather.update', selectedCity.value));
+};
+
+const resetWeatherSimulation = () => {
+    router.post(route('admin.weather.reset', selectedCity.value), {}, {
+        preserveScroll: true,
+    });
+};
+
+const focusMap = (dest) => {
+    if (map && dest.lat && dest.lng) {
+        map.flyTo([dest.lat, dest.lng], 16, {
+            animate: true,
+            duration: 1.5
+        });
+        
+        mapMarkers.forEach(marker => {
+            const pos = marker.getLatLng();
+            if (Math.abs(pos.lat - dest.lat) < 0.0001 && Math.abs(pos.lng - dest.lng) < 0.0001) {
+                marker.openPopup();
+            }
+        });
+        
+        document.getElementById('interactive-map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 };
 
 const weatherIcon = (s) => s === 'Hujan' ? '🌧️' : s === 'Berawan' ? '☁️' : '☀️';
@@ -371,7 +397,8 @@ watch(() => props.guideData?.city?.name, () => {
 
                             <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div v-for="dest in props.guideData.destinations" :key="dest.id"
-                                    class="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col">
+                                    @click="focusMap(dest)"
+                                    class="cursor-pointer group bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col">
 
                                     <!-- Image -->
                                     <div class="relative h-44 overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0">
@@ -464,10 +491,16 @@ watch(() => props.guideData?.city?.name, () => {
                                                 class="block w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 text-sm focus:border-rose-400 focus:ring-rose-400 py-2 px-2.5">
                                         </div>
                                     </div>
-                                    <button type="submit" :disabled="weatherForm.processing"
-                                        class="w-full rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-[0.98] disabled:opacity-50 text-white text-sm font-bold py-2.5 transition-all shadow-sm shadow-rose-200">
-                                        Perbarui Simulasi
-                                    </button>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button type="submit" :disabled="weatherForm.processing"
+                                            class="w-full rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-[0.98] disabled:opacity-50 text-white text-xs font-bold py-2.5 transition-all shadow-sm shadow-rose-200 dark:shadow-rose-900/20">
+                                            Simulasikan
+                                        </button>
+                                        <button type="button" @click="resetWeatherSimulation"
+                                            class="w-full rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 active:scale-[0.98] text-slate-700 dark:text-slate-300 text-xs font-bold py-2.5 transition-all">
+                                            Reset Real-time
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
 

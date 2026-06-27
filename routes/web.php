@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('admin/destinations', \App\Http\Controllers\Admin\DestinationController::class)->except(['create', 'show', 'edit']);
     Route::post('admin/weather/{city}', [GuideController::class, 'updateWeather'])->name('admin.weather.update');
+    Route::post('admin/weather/reset/{city}', [GuideController::class, 'resetWeather'])->name('admin.weather.reset');
 });
 
 require __DIR__.'/auth.php';

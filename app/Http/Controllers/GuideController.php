@@ -97,6 +97,16 @@ class GuideController extends Controller
     }
 
     /**
+     * Admin action to reset weather to live data
+     */
+    public function resetWeather(Request $request, $cityId)
+    {
+        \App\Models\WeatherCondition::where('city_id', $cityId)->delete();
+
+        return redirect()->back()->with('success', 'Simulasi cuaca dihentikan. Mengambil data cuaca real-time.');
+    }
+
+    /**
      * Render the Smart Recommendation Map page.
      */
     public function smartMap()

@@ -41,8 +41,58 @@ class WeatherAdaptiveGuideService
             ];
         }
 
-        // Get simulated weather or live weather
         $weather = $this->weatherRepo->findByCityId($cityId);
+        
+        $openWeatherKey = config('services.openweather.api_key');
+        
+        // Fetch live weather if we don't have it, or if it hasn't been updated in the last 15 minutes.
+        // This allows the Weather Simulator to still work (since simulation updates the timestamp).
+        if ($openWeatherKey && (!$weather || $weather->updated_at->diffInMinutes(now()) > 15)) {
+            try {
+                $cityCoords = [
+                    'Jakarta' => [-6.2088, 106.8456],
+                    'Malang' => [-7.9839, 112.6214],
+                    'Bandung' => [-6.9175, 107.6191],
+                    'Bogor' => [-6.5971, 106.8060],
+                    'Batu' => [-7.8712, 112.5269],
+                    'Bali' => [-8.4095, 115.1889],
+                    'Yogyakarta' => [-7.7956, 110.3695]
+                ];
+                $coords = $cityCoords[$city->name] ?? null;
+                
+                if ($coords) {
+                    $weatherUrl = "https://api.openweathermap.org/data/2.5/weather";
+                    $weatherRes = Http::withoutVerifying()->get($weatherUrl, [
+                        'lat' => $coords[0],
+                        'lon' => $coords[1],
+                        'appid' => $openWeatherKey,
+                        'units' => 'metric'
+                    ]);
+                    
+                    if ($weatherRes->successful()) {
+                        $wData = $weatherRes->json();
+                        $mainWeather = $wData['weather'][0]['main'] ?? 'Clear';
+                        
+                        $weatherStatus = 'Cerah';
+                        if (in_array(strtolower($mainWeather), ['rain', 'drizzle', 'thunderstorm'])) {
+                            $weatherStatus = 'Hujan';
+                        } elseif (in_array(strtolower($mainWeather), ['clouds', 'mist', 'haze', 'fog'])) {
+                            $weatherStatus = 'Berawan';
+                        }
+                        
+                        $weather = $this->weatherRepo->updateWeather($cityId, [
+                            'status' => $weatherStatus,
+                            'temperature' => $wData['main']['temp'] ?? 28,
+                            'humidity' => $wData['main']['humidity'] ?? 70,
+                            'wind_speed' => $wData['wind']['speed'] ?? 10
+                        ]);
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error("Failed fetching live weather for city: " . $e->getMessage());
+            }
+        }
+
         if (!$weather) {
             $weather = $this->weatherRepo->updateWeather($cityId, [
                 'status' => 'Cerah',
@@ -295,6 +345,58 @@ class WeatherAdaptiveGuideService
                         'opening_hours' => '08.00 - 17.00',
                         'photo' => 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=600'
                     ]
+                ],
+                'Bali' => [
+                    [
+                        'name' => 'Pantai Kuta',
+                        'lat' => -8.7185,
+                        'lng' => 115.1686,
+                        'category' => 'outdoor',
+                        'rating' => 4.5,
+                        'description' => 'Pantai berpasir putih legendaris yang sempurna untuk bersantai.',
+                        'address' => 'Kuta, Kabupaten Badung, Bali',
+                        'open_now' => true,
+                        'opening_hours' => '24 Jam',
+                        'photo' => 'https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?q=80&w=600'
+                    ],
+                    [
+                        'name' => 'Garuda Wisnu Kencana (GWK)',
+                        'lat' => -8.8104,
+                        'lng' => 115.1676,
+                        'category' => 'outdoor',
+                        'rating' => 4.7,
+                        'description' => 'Taman budaya dengan patung raksasa GWK.',
+                        'address' => 'Jl. Raya Uluwatu, Ungasan, Kuta Selatan',
+                        'open_now' => true,
+                        'opening_hours' => '08:00 - 21:00',
+                        'photo' => 'https://images.unsplash.com/photo-1554481923-a6918bd997bc?q=80&w=600'
+                    ]
+                ],
+                'Yogyakarta' => [
+                    [
+                        'name' => 'Candi Prambanan',
+                        'lat' => -7.7520,
+                        'lng' => 110.4914,
+                        'category' => 'outdoor',
+                        'rating' => 4.8,
+                        'description' => 'Kompleks candi Hindu terbesar di Indonesia yang megah.',
+                        'address' => 'Jl. Raya Solo - Yogyakarta, Prambanan',
+                        'open_now' => true,
+                        'opening_hours' => '06:00 - 17:00',
+                        'photo' => 'https://images.unsplash.com/photo-1584810359583-96fc3448beaa?q=80&w=600'
+                    ],
+                    [
+                        'name' => 'Museum Ullen Sentalu',
+                        'lat' => -7.5976,
+                        'lng' => 110.4234,
+                        'category' => 'indoor',
+                        'rating' => 4.9,
+                        'description' => 'Museum budaya dan seni Jawa yang terletak di kawasan Kaliurang.',
+                        'address' => 'Jl. Boyong, Kaliurang, Sleman',
+                        'open_now' => true,
+                        'opening_hours' => '08:30 - 16:00',
+                        'photo' => 'https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?q=80&w=600'
+                    ]
                 ]
             ];
 
@@ -340,6 +442,11 @@ class WeatherAdaptiveGuideService
                 $photo = $item['photo'];
                 $category = $item['category'];
                 $description = $item['description'];
+            }
+
+            // Strict Filter for Hujan
+            if ($weatherStatus === 'Hujan' && $category === 'outdoor') {
+                continue;
             }
 
             // Calculate distance
@@ -736,6 +843,58 @@ class WeatherAdaptiveGuideService
                         'opening_hours' => '08.00 - 17.00',
                         'photo' => 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=600'
                     ]
+                ],
+                'Bali' => [
+                    [
+                        'name' => 'Pantai Kuta',
+                        'lat' => -8.7185,
+                        'lng' => 115.1686,
+                        'category' => 'outdoor',
+                        'rating' => 4.5,
+                        'description' => 'Pantai berpasir putih legendaris yang sempurna untuk bersantai.',
+                        'address' => 'Kuta, Kabupaten Badung, Bali',
+                        'open_now' => true,
+                        'opening_hours' => '24 Jam',
+                        'photo' => 'https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?q=80&w=600'
+                    ],
+                    [
+                        'name' => 'Garuda Wisnu Kencana (GWK)',
+                        'lat' => -8.8104,
+                        'lng' => 115.1676,
+                        'category' => 'outdoor',
+                        'rating' => 4.7,
+                        'description' => 'Taman budaya dengan patung raksasa GWK.',
+                        'address' => 'Jl. Raya Uluwatu, Ungasan, Kuta Selatan',
+                        'open_now' => true,
+                        'opening_hours' => '08:00 - 21:00',
+                        'photo' => 'https://images.unsplash.com/photo-1554481923-a6918bd997bc?q=80&w=600'
+                    ]
+                ],
+                'Yogyakarta' => [
+                    [
+                        'name' => 'Candi Prambanan',
+                        'lat' => -7.7520,
+                        'lng' => 110.4914,
+                        'category' => 'outdoor',
+                        'rating' => 4.8,
+                        'description' => 'Kompleks candi Hindu terbesar di Indonesia yang megah.',
+                        'address' => 'Jl. Raya Solo - Yogyakarta, Prambanan',
+                        'open_now' => true,
+                        'opening_hours' => '06:00 - 17:00',
+                        'photo' => 'https://images.unsplash.com/photo-1584810359583-96fc3448beaa?q=80&w=600'
+                    ],
+                    [
+                        'name' => 'Museum Ullen Sentalu',
+                        'lat' => -7.5976,
+                        'lng' => 110.4234,
+                        'category' => 'indoor',
+                        'rating' => 4.9,
+                        'description' => 'Museum budaya dan seni Jawa yang terletak di kawasan Kaliurang.',
+                        'address' => 'Jl. Boyong, Kaliurang, Sleman',
+                        'open_now' => true,
+                        'opening_hours' => '08:30 - 16:00',
+                        'photo' => 'https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?q=80&w=600'
+                    ]
                 ]
             ];
 
@@ -785,6 +944,11 @@ class WeatherAdaptiveGuideService
                 $photo = $item['photo'];
                 $category = $item['category'];
                 $description = $item['description'];
+            }
+
+            // Strict Filter for Hujan
+            if ($weatherStatus === 'Hujan' && $category === 'outdoor') {
+                continue;
             }
 
             // Calculate distance
