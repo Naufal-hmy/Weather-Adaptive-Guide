@@ -287,10 +287,7 @@ watch(() => props.guideData?.city?.name, () => {
                 
                 <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                     <div class="max-w-2xl">
-                        <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md rounded-full px-4 py-1.5 mb-6 border border-white/10 shadow-lg">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span class="text-[11px] font-bold text-white/90 tracking-widest uppercase">AI Engine Active</span>
-                        </div>
+
                         <h2 class="text-4xl md:text-5xl font-black tracking-tight text-white mb-4 leading-tight">
                             Smart Travel <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-emerald-400 to-emerald-200">Weather Guide</span>
                         </h2>
@@ -578,7 +575,6 @@ watch(() => props.guideData?.city?.name, () => {
                                     </svg>
                                 </div>
                                 <div class="relative z-10 flex-1">
-                                    <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2 bg-indigo-50 dark:bg-indigo-900/50 inline-block px-3 py-1 rounded-full">AI Reasoning Insight</h4>
                                     <p class="text-lg text-slate-700 dark:text-slate-300 font-bold leading-relaxed">
                                         {{ props.guideData.reason }}
                                     </p>
