@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('admin'),
-            'is_admin' => true,
+            'is_admin' => 'true',
         ]);
 
         // Regular user
@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'User',
             'email' => 'user@gmail.com',
             'password' => bcrypt('user'),
-            'is_admin' => false,
+            'is_admin' => 'false',
         ]);
 
         $this->call([
