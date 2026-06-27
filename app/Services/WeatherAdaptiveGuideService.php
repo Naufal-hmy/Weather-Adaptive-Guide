@@ -70,7 +70,7 @@ class WeatherAdaptiveGuideService
         $startingLng = $coords[1];
 
         // 1. Fetch live destinations using Google Places API or mock fallback
-        $googleKey = env('GOOGLE_MAPS_API_KEY');
+        $googleKey = config('services.google.maps_api_key');
         $rawPlaces = [];
 
         if ($googleKey) {
@@ -463,7 +463,7 @@ class WeatherAdaptiveGuideService
             $weatherStatus = request()->query('force_weather');
             $weatherTemp = $weatherStatus === 'Hujan' ? 22 : ($weatherStatus === 'Berawan' ? 25 : 29);
         } else {
-            $openWeatherKey = env('OPENWEATHER_API_KEY');
+            $openWeatherKey = config('services.openweather.api_key');
             if ($openWeatherKey) {
                 try {
                     $weatherUrl = "https://api.openweathermap.org/data/2.5/weather";
@@ -504,7 +504,7 @@ class WeatherAdaptiveGuideService
         ];
 
         // 2. Fetch live destinations using Google Places API or mock fallback
-        $googleKey = env('GOOGLE_MAPS_API_KEY');
+        $googleKey = config('services.google.maps_api_key');
         $rawPlaces = [];
 
         if ($googleKey) {
@@ -859,6 +859,7 @@ class WeatherAdaptiveGuideService
 
     /**
      * Helper distance calculator (Haversine formula)
+     * @deprecated Use the CalculatesDistance trait instead.
      */
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
