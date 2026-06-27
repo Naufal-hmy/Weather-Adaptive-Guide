@@ -10,14 +10,13 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
+Route::get('/dashboard', [GuideController::class, 'index'])
+    ->name('dashboard');
+
+Route::get('/api/nearby-recommendations', [GuideController::class, 'getNearbyRecommendations'])
+    ->name('api.nearby-recommendations');
+
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [GuideController::class, 'index'])
-        ->name('dashboard');
-
-
-
-    Route::get('/api/nearby-recommendations', [GuideController::class, 'getNearbyRecommendations'])
-        ->name('api.nearby-recommendations');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
