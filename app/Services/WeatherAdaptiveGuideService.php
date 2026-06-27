@@ -419,7 +419,7 @@ class WeatherAdaptiveGuideService
                 $photoRef = $item['photos'][0]['photo_reference'] ?? null;
                 $photo = $photoRef 
                     ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photo_reference={$photoRef}&key={$googleKey}" 
-                    : 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=600';
+                    : "https://placehold.co/600x400/1e293b/ffffff.png?text=" . urlencode($name);
                 
                 // Categorize based on keywords/types
                 $types = $item['types'] ?? [];
@@ -439,7 +439,9 @@ class WeatherAdaptiveGuideService
                 $address = $item['address'];
                 $openNow = $item['open_now'];
                 $openingHours = $item['opening_hours'];
-                $photo = $item['photo'];
+                $photo = $googleKey 
+                    ? "https://maps.googleapis.com/maps/api/staticmap?center={$lat},{$lng}&zoom=15&size=600x400&markers=color:red%7C{$lat},{$lng}&key={$googleKey}" 
+                    : "https://placehold.co/600x400/1e293b/ffffff.png?text=" . urlencode($name);
                 $category = $item['category'];
                 $description = $item['description'];
             }
@@ -921,7 +923,7 @@ class WeatherAdaptiveGuideService
                 $photoRef = $item['photos'][0]['photo_reference'] ?? null;
                 $photo = $photoRef 
                     ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photo_reference={$photoRef}&key={$googleKey}" 
-                    : 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=600';
+                    : ($googleKey ? "https://maps.googleapis.com/maps/api/staticmap?center={$pLat},{$pLng}&zoom=15&size=600x400&markers=color:red%7C{$pLat},{$pLng}&key={$googleKey}" : "https://placehold.co/600x400/1e293b/ffffff.png?text=" . urlencode($name));
                 
                 // Categorize based on keywords/types
                 $types = $item['types'] ?? [];
@@ -941,7 +943,9 @@ class WeatherAdaptiveGuideService
                 $address = $item['address'];
                 $openNow = $item['open_now'];
                 $openingHours = $item['opening_hours'];
-                $photo = $item['photo'];
+                $photo = $googleKey 
+                    ? "https://maps.googleapis.com/maps/api/staticmap?center={$pLat},{$pLng}&zoom=15&size=600x400&markers=color:red%7C{$pLat},{$pLng}&key={$googleKey}" 
+                    : "https://placehold.co/600x400/1e293b/ffffff.png?text=" . urlencode($name);
                 $category = $item['category'];
                 $description = $item['description'];
             }
