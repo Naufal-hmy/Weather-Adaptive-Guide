@@ -191,30 +191,30 @@ const resetForm = () => {
 
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <InputLabel value="Min Suhu °C" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1" />
+                                        <InputLabel value="Min Suhu °C" class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1" />
                                         <TextInput v-model="form.min_temp" type="number" placeholder="Opsional"
-                                            class="block w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2.5" />
+                                            class="block w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2.5" />
                                     </div>
                                     <div>
-                                        <InputLabel value="Max Suhu °C" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1" />
+                                        <InputLabel value="Max Suhu °C" class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1" />
                                         <TextInput v-model="form.max_temp" type="number" placeholder="Opsional"
-                                            class="block w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2.5" />
+                                            class="block w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2.5" />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <InputLabel value="Deskripsi" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1" />
+                                    <InputLabel value="Deskripsi" class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1" />
                                     <textarea v-model="form.description" rows="3"
                                         placeholder="Gambaran singkat tentang destinasi ini..."
-                                        class="block w-full rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2.5 px-3.5 resize-none shadow-sm"
+                                        class="block w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2.5 px-3.5 resize-none shadow-sm"
                                         required></textarea>
                                     <p v-if="form.errors.description" class="text-xs text-rose-500 mt-1">{{ form.errors.description }}</p>
                                 </div>
 
                                 <div>
-                                    <InputLabel value="URL Gambar (opsional)" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1" />
+                                    <InputLabel value="URL Gambar (opsional)" class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1" />
                                     <TextInput v-model="form.image_url" type="url" placeholder="https://images.unsplash.com/..."
-                                        class="block w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2.5" />
+                                        class="block w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2.5" />
                                 </div>
 
                                 <!-- Image preview -->
@@ -248,18 +248,18 @@ const resetForm = () => {
 
                     <!-- TABLE PANEL -->
                     <div class="lg:col-span-8">
-                        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
 
                             <!-- Table header -->
-                            <div class="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
-                                    <h3 class="text-base font-bold text-slate-900">Daftar Destinasi</h3>
-                                    <p class="text-xs text-slate-400 mt-0.5">{{ filteredDestinations?.length || 0 }} dari {{ props.destinations?.length || 0 }} destinasi</p>
+                                    <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Daftar Destinasi</h3>
+                                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{{ filteredDestinations?.length || 0 }} dari {{ props.destinations?.length || 0 }} destinasi</p>
                                 </div>
                                 <!-- Search -->
                                 <div class="relative">
                                     <input v-model="searchQuery" type="text" placeholder="Cari nama, kota, kategori..."
-                                        class="block w-full sm:w-56 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2 pl-9 pr-3 shadow-sm">
+                                        class="block w-full sm:w-56 rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500 focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2 pl-9 pr-3 shadow-sm">
                                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                     </svg>
@@ -269,7 +269,7 @@ const resetForm = () => {
                             <!-- Table -->
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm text-left">
-                                    <thead class="text-[10px] text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100">
+                                    <thead class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                                         <tr>
                                             <th class="px-5 py-3.5 font-bold">Destinasi</th>
                                             <th class="px-4 py-3.5 font-bold">Kota</th>
@@ -279,14 +279,14 @@ const resetForm = () => {
                                             <th class="px-4 py-3.5 text-right font-bold">Aksi</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-slate-50">
+                                    <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
 
                                         <!-- Empty state -->
                                         <tr v-if="!filteredDestinations?.length">
                                             <td colspan="6" class="px-5 py-12 text-center">
                                                 <div class="flex flex-col items-center gap-2">
                                                     <span class="text-3xl">🗺️</span>
-                                                    <p class="text-sm font-medium text-slate-500">
+                                                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
                                                         {{ searchQuery ? 'Tidak ada destinasi yang cocok.' : 'Belum ada destinasi. Tambahkan yang pertama!' }}
                                                     </p>
                                                 </div>
@@ -294,8 +294,8 @@ const resetForm = () => {
                                         </tr>
 
                                         <tr v-for="dest in filteredDestinations" :key="dest.id"
-                                            class="group hover:bg-indigo-50/40 transition-colors duration-150"
-                                            :class="editingId === dest.id ? 'bg-indigo-50/60 border-l-4 border-l-indigo-400' : ''">
+                                            class="group hover:bg-indigo-50/40 dark:hover:bg-indigo-900/20 transition-colors duration-150"
+                                            :class="editingId === dest.id ? 'bg-indigo-50/60 dark:bg-indigo-900/30 border-l-4 border-l-indigo-400' : ''">
 
                                             <!-- Destination name + image -->
                                             <td class="px-5 py-4">
@@ -307,15 +307,15 @@ const resetForm = () => {
                                                         <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                                     </div>
                                                     <div class="min-w-0">
-                                                        <p class="font-semibold text-slate-900 text-sm leading-snug truncate max-w-[160px]">{{ dest.name }}</p>
-                                                        <p class="text-[10px] text-slate-400 mt-0.5 truncate max-w-[160px]">🕒 {{ dest.opening_hours }}</p>
+                                                        <p class="font-semibold text-slate-900 dark:text-slate-100 text-sm leading-snug truncate max-w-[160px]">{{ dest.name }}</p>
+                                                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 truncate max-w-[160px]">🕒 {{ dest.opening_hours }}</p>
                                                     </div>
                                                 </div>
                                             </td>
 
-                                            <td class="px-4 py-4 text-sm text-slate-600 whitespace-nowrap">
+                                            <td class="px-4 py-4 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">
                                                 <span class="flex items-center gap-1">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300 inline-block"></span>
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 inline-block"></span>
                                                     {{ dest.city?.name }}
                                                 </span>
                                             </td>
@@ -323,23 +323,23 @@ const resetForm = () => {
                                             <td class="px-4 py-4">
                                                 <span :class="['inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider',
                                                     dest.category === 'indoor'
-                                                        ? 'bg-indigo-50 text-indigo-700 border border-indigo-100'
-                                                        : 'bg-emerald-50 text-emerald-700 border border-emerald-100']">
+                                                        ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/50'
+                                                        : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50']">
                                                     {{ dest.category === 'indoor' ? '🏠' : '🌳' }} {{ dest.category }}
                                                 </span>
                                             </td>
 
-                                            <td class="px-4 py-4 text-xs text-slate-500 whitespace-nowrap">
+                                            <td class="px-4 py-4 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                                 <span v-if="dest.min_temp || dest.max_temp">
                                                     {{ dest.min_temp ?? '—' }}° – {{ dest.max_temp ?? '—' }}°C
                                                 </span>
-                                                <span v-else class="text-slate-300 italic">semua suhu</span>
+                                                <span v-else class="text-slate-300 dark:text-slate-600 italic">semua suhu</span>
                                             </td>
 
                                             <td class="px-4 py-4 whitespace-nowrap">
                                                 <div class="flex items-center gap-1">
                                                     <span class="text-amber-400 text-sm">⭐</span>
-                                                    <span class="text-sm font-bold text-slate-700">{{ dest.rating }}</span>
+                                                    <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ dest.rating }}</span>
                                                 </div>
                                             </td>
 
