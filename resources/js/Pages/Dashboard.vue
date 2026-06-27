@@ -16,6 +16,22 @@ const searchQuery = ref('');
 const showSuggestions = ref(false);
 const searchInput = ref(null);
 
+// Get current date string (YYYY-MM-DD)
+const getTodayString = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+};
+
+const getMaxDateString = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 5);
+    return d.toISOString().split('T')[0];
+};
+
+const selectedDate = ref(getTodayString());
+const selectedTime = ref('12:00');
+const isMapLoading = ref(false);
+
 const filteredCities = computed(() => {
     if (!searchQuery.value) {
         return props.cities;
@@ -64,7 +80,7 @@ const initAutocomplete = () => {
             const lng = place.geometry.location.lng();
             const name = place.name;
             
-            router.get(route('dashboard'), { lat, lng, q: name }, { preserveState: true });
+            router.get(route('dashboard'), { lat, lng, q: name, date: selectedDate.value, time: selectedTime.value }, { preserveState: true });
         }
     });
 };
@@ -99,13 +115,38 @@ watch(() => props.selectedCityId, (newId) => {
     }
 });
 
+// Update dashboard based on city selection or date change
+const changeCity = () => {
+    router.get(route('dashboard'), { city_id: selectedCity.value, date: selectedDate.value, time: selectedTime.value }, { preserveState: true });
+};
+
+// Also trigger update when date or time changes
+watch([selectedDate, selectedTime], ([newDate, newTime], [oldDate, oldTime]) => {
+    if (newDate !== oldDate || newTime !== oldTime) {
+        // If we have coordinates from search, use them instead of city_id
+        if (props.guideData?.user?.lat && props.guideData?.user?.lng && props.guideData?.city?.name) {
+             router.get(route('dashboard'), { 
+                lat: props.guideData.user.lat, 
+                lng: props.guideData.user.lng, 
+                q: props.guideData.city.name, 
+                date: newDate,
+                time: newTime
+            }, { preserveState: true });
+        } else {
+             changeCity();
+        }
+    }
+});
+
 // Hardcoded coordinates for map visual targeting
 const cityCoords = {
     'Jakarta': [-6.2088, 106.8456],
     'Malang': [-7.9839, 112.6214],
     'Bandung': [-6.9175, 107.6191],
     'Bogor': [-6.5971, 106.8060],
-    'Batu': [-7.8712, 112.5269]
+    'Batu': [-7.8712, 112.5269],
+    'Bali': [-8.4095, 115.1889],
+    'Yogyakarta': [-7.7956, 110.3695]
 };
 
 let map = null;
@@ -119,11 +160,6 @@ const weatherForm = useForm({
     humidity: props.guideData?.weather?.humidity || 70,
     wind_speed: props.guideData?.weather?.wind_speed || 10,
 });
-
-// Update dashboard based on city selection
-const changeCity = () => {
-    router.get(route('dashboard'), { city_id: selectedCity.value }, { preserveState: true });
-};
 
 // Admin action to update weather
 const submitWeatherSimulation = () => {
@@ -180,36 +216,26 @@ const updateMap = () => {
     
     const bounds = [];
 
-    // 1. User Position Marker (if tracking is allowed)
-    if (userLocation.value) {
-        const userPoint = [userLocation.value.lat, userLocation.value.lng];
-        bounds.push(userPoint);
-        const uMarker = L.marker(userPoint, { icon: createCustomIcon('indigo', 'U') })
+    // 1. User Position Marker
+    let startPoint = [coords[0], coords[1]];
+
+    // Check if guideData provides specific search coordinates
+    if (props.guideData?.user?.lat && props.guideData?.user?.lng) {
+        startPoint = [props.guideData.user.lat, props.guideData.user.lng];
+        bounds.push(startPoint);
+        const sMarker = L.marker(startPoint, { icon: createCustomIcon('indigo', 'S') })
             .addTo(map)
-            .bindPopup("<b>Posisi Anda Saat Ini</b>");
-        mapMarkers.push(uMarker);
+            .bindPopup(`<b>${cityName}</b>`);
+        mapMarkers.push(sMarker);
     } else {
-        // Fallback user position slightly offset for visual mapping demo
-        const userPoint = [coords[0] + 0.008, coords[1] - 0.008];
-        bounds.push(userPoint);
-        const uMarker = L.marker(userPoint, { icon: createCustomIcon('indigo', 'U') })
+        bounds.push(startPoint);
+        const sMarker = L.marker(startPoint, { icon: createCustomIcon('blue', 'S') })
             .addTo(map)
-            .bindPopup("<b>Estimasi Posisi Anda</b>");
-        mapMarkers.push(uMarker);
+            .bindPopup(`<b>${cityName} (Pusat Kota)</b>`);
+        mapMarkers.push(sMarker);
     }
 
-    // 2. City Center / Starting Point
-    const weatherStatus = props.guideData?.weather?.status || 'Cerah';
-    const startPoint = [coords[0], coords[1]];
-    bounds.push(startPoint);
-    
-    const startingColor = weatherStatus === 'Hujan' ? 'red' : 'blue';
-    const sMarker = L.marker(startPoint, { icon: createCustomIcon(startingColor, 'S') })
-        .addTo(map)
-        .bindPopup(`<b>${cityName} (Pusat Kota)</b><br>Cuaca: ${weatherStatus}`);
-    mapMarkers.push(sMarker);
-
-    // 3. Recommended Places (Google Places API alternatives)
+    // 2. Recommended Places
     if (props.guideData?.destinations) {
         props.guideData.destinations.forEach((dest, i) => {
             if (dest.lat && dest.lng) {
@@ -224,9 +250,6 @@ const updateMap = () => {
                             <span class="text-[10px] font-bold text-emerald-600 uppercase block">Rekomendasi #${i+1}</span>
                             <h4 class="text-xs font-bold text-slate-800 mt-0.5">${dest.name}</h4>
                             <p class="text-[10px] text-slate-500 mt-1">⭐ ${dest.rating} • ${dest.distance} km</p>
-                            <span class="inline-block mt-1 text-[9px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded">
-                                Match: ${dest.suitability_score}%
-                            </span>
                         </div>
                     `);
                 mapMarkers.push(dMarker);
@@ -235,38 +258,71 @@ const updateMap = () => {
     }
 
     if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [40, 40] });
+        map.flyToBounds(bounds, { padding: [40, 40], duration: 1.5 });
     }
 };
 
 onMounted(() => {
-    // Geolocation trigger
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((pos) => {
-            userLocation.value = {
-                lat: pos.coords.latitude,
-                lng: pos.coords.longitude
-            };
-            updateMap();
-        });
+    // Initial map setup
+    let startCoords = [-7.8712, 112.5269]; // Default Batu
+    if (props.guideData?.user?.lat && props.guideData?.user?.lng) {
+        startCoords = [props.guideData.user.lat, props.guideData.user.lng];
+    } else {
+        const cityName = props.guideData?.city?.name;
+        if (cityCoords[cityName]) {
+            startCoords = cityCoords[cityName];
+        }
     }
 
-    // Initial map setup
-    const cityName = props.guideData?.city?.name;
-    const coords = cityCoords[cityName] || [-7.8712, 112.5269];
-
-    map = L.map('interactive-map').setView(coords, 12);
+    map = L.map('interactive-map').setView(startCoords, 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
+    map.on('click', async (e) => {
+        if (isMapLoading.value) return;
+        isMapLoading.value = true;
+        document.body.style.cursor = 'wait';
+        
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
+                headers: {
+                    'Accept-Language': 'id-ID,id;q=0.9',
+                    'User-Agent': 'AeroWeather/1.0'
+                }
+            });
+            const data = await response.json();
+            const name = data.address?.city || data.address?.town || data.address?.village || data.address?.county || data.address?.state || "Lokasi Pilihan";
+            
+            router.get(route('dashboard'), { lat, lng, q: name, date: selectedDate.value, time: selectedTime.value }, { 
+                preserveState: true,
+                onFinish: () => { isMapLoading.value = false; document.body.style.cursor = 'default'; }
+            });
+        } catch (error) {
+            router.get(route('dashboard'), { lat, lng, q: "Lokasi Pilihan", date: selectedDate.value, time: selectedTime.value }, { 
+                preserveState: true,
+                onFinish: () => { isMapLoading.value = false; document.body.style.cursor = 'default'; }
+            });
+        }
+    });
+
     updateMap();
     loadGooglePlacesAutocomplete();
+    
+    // Check URL query parameters for date to set initial state correctly if navigated directly
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('date');
+    if (dateParam) {
+        selectedDate.value = dateParam;
+    }
 });
 
-// Watch for changes in city name to move the map
-watch(() => props.guideData?.city?.name, () => {
+// Watch for changes in city name or user lat/lng to move the map
+watch(() => [props.guideData?.city?.name, props.guideData?.user?.lat, props.guideData?.user?.lng], () => {
     updateMap();
     if (props.guideData?.weather) {
         weatherForm.status = props.guideData.weather.status;
@@ -274,7 +330,7 @@ watch(() => props.guideData?.city?.name, () => {
         weatherForm.humidity = props.guideData.weather.humidity;
         weatherForm.wind_speed = props.guideData.weather.wind_speed;
     }
-});
+}, { deep: true });
 </script>
 
 <template>
@@ -345,6 +401,28 @@ watch(() => props.guideData?.city?.name, () => {
                                         </svg>
                                     </button>
                                 </div>
+                                
+                                <div class="mt-4 grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest mb-2 truncate">Tanggal</label>
+                                        <input 
+                                            type="date" 
+                                            v-model="selectedDate" 
+                                            :min="getTodayString()" 
+                                            :max="getMaxDateString()"
+                                            class="block w-full rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 text-sm font-bold text-slate-700 dark:text-slate-200 focus:border-indigo-500 focus:ring-0 py-3 px-4 shadow-inner transition-all hover:bg-white dark:hover:bg-slate-800"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest mb-2 truncate">Jam</label>
+                                        <input 
+                                            type="time" 
+                                            v-model="selectedTime"
+                                            class="block w-full rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 text-sm font-bold text-slate-700 dark:text-slate-200 focus:border-indigo-500 focus:ring-0 py-3 px-4 shadow-inner transition-all hover:bg-white dark:hover:bg-slate-800"
+                                        >
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-2 font-medium">Prediksi rekomendasi cuaca tersedia hingga H+5.</p>
 
                                 <!-- Suggestions Dropdown -->
                                 <Transition
@@ -374,18 +452,7 @@ watch(() => props.guideData?.city?.name, () => {
                             </div>
                         </div>
 
-                        <!-- Map Card -->
-                        <div class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-[2rem] border border-white dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-slate-200/60 dark:hover:shadow-slate-900/50 transition-all duration-300 p-2">
-                            <div class="px-6 pt-5 pb-4 flex items-center justify-between">
-                                <h3 class="text-lg font-black text-slate-800 dark:text-slate-100">Peta Interaktif</h3>
-                                <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-                                </div>
-                            </div>
-                            <div class="relative overflow-hidden rounded-[1.5rem] border-4 border-white dark:border-slate-700 shadow-inner bg-slate-100 dark:bg-slate-900 mx-2 mb-2">
-                                <div id="interactive-map" class="w-full h-72 z-10"></div>
-                            </div>
-                        </div>
+
 
                         <!-- Statistics Card -->
                         <div class="bg-slate-900 rounded-[2rem] shadow-2xl p-8 text-white overflow-hidden relative group">
@@ -596,6 +663,30 @@ watch(() => props.guideData?.city?.name, () => {
                                     </p>
                                 </div>
                             </div>
+                        </template>
+
+                    </div>
+                </div>
+                
+                <template v-if="!props.guideData.is_error">
+                    <!-- Map Card (Full Width) -->
+                    <div class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-[2rem] border border-white dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-slate-200/60 dark:hover:shadow-slate-900/50 transition-all duration-300 p-2 mt-12 w-full">
+                                <div class="px-6 pt-5 pb-4 flex items-center justify-between">
+                                    <h3 class="text-xl font-black text-slate-800 dark:text-slate-100">Peta Interaktif</h3>
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                                    </div>
+                                </div>
+                                <div class="relative overflow-hidden rounded-[1.5rem] border-4 border-white dark:border-slate-700 shadow-inner bg-slate-100 dark:bg-slate-900 mx-2 mb-2">
+                                    <div id="interactive-map" class="w-full h-96 z-10 cursor-crosshair"></div>
+                                    <div v-if="isMapLoading" class="absolute inset-0 z-[400] bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm flex items-center justify-center">
+                                        <div class="bg-indigo-600 text-white px-6 py-3 rounded-full font-black shadow-xl flex items-center gap-3 animate-pulse">
+                                            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            Memuat Lokasi...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Recommendations Section -->
                             <div class="space-y-8 pt-6">
@@ -610,7 +701,7 @@ watch(() => props.guideData?.city?.name, () => {
                                 </div>
 
                                 <!-- Cards Grid -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                                     <div 
                                         v-for="dest in props.guideData.destinations" 
                                         :key="dest.id" 
@@ -681,10 +772,6 @@ watch(() => props.guideData?.city?.name, () => {
                                 </div>
                             </div>
                         </template>
-
-                    </div>
-                </div>
-
             </div>
         </div>
     </AuthenticatedLayout>

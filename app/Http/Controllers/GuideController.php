@@ -35,9 +35,12 @@ class GuideController extends Controller
         $lat = $request->query('lat');
         $lng = $request->query('lng');
         $locationName = $request->query('q');
+        $date = $request->query('date');
+        $time = $request->query('time', '12:00:00');
+        $datetime = $date ? "$date $time" : null;
 
         if ($lat && $lng) {
-            $guideData = $this->guideService->getRecommendationsForCoordinates($lat, $lng, $locationName);
+            $guideData = $this->guideService->getRecommendationsForCoordinates($lat, $lng, $locationName, $datetime);
             $selectedCityId = null;
         } else {
             if ($cities->isEmpty()) {
@@ -53,7 +56,7 @@ class GuideController extends Controller
             }
             
             $selectedCityId = $request->query('city_id', $cities->first()->id);
-            $guideData = $this->guideService->getRecommendations($selectedCityId);
+            $guideData = $this->guideService->getRecommendations($selectedCityId, null, null, $datetime);
         }
 
         // Fetch statistics (indoor vs outdoor destinations count)

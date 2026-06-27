@@ -31,7 +31,7 @@ class WeatherAdaptiveGuideService
     /**
      * Generate weather-adaptive recommendations for a given city using Google Places API.
      */
-    public function getRecommendations($cityId, $userLat = null, $userLng = null)
+    public function getRecommendations($cityId, $userLat = null, $userLng = null, $date = null)
     {
         $city = $this->cityRepo->findById($cityId);
         if (!$city) {
@@ -45,9 +45,16 @@ class WeatherAdaptiveGuideService
         
         $openWeatherKey = config('services.openweather.api_key');
         
-        // Fetch live weather if we don't have it, or if it hasn't been updated in the last 15 minutes.
-        // This allows the Weather Simulator to still work (since simulation updates the timestamp).
-        if ($openWeatherKey && (!$weather || $weather->updated_at->diffInMinutes(now()) > 15)) {
+        $isFutureDate = false;
+        if ($date) {
+            $dateObj = \Carbon\Carbon::parse($date);
+            if ($dateObj->isFuture() && !$dateObj->isToday()) {
+                $isFutureDate = true;
+            }
+        }
+
+        // Fetch live weather if we don't have it, or if it hasn't been updated in the last 15 minutes, or if future date is requested.
+        if ($openWeatherKey && ($isFutureDate || !$weather || $weather->updated_at->diffInMinutes(now()) > 15)) {
             try {
                 $cityCoords = [
                     'Jakarta' => [-6.2088, 106.8456],
@@ -61,17 +68,63 @@ class WeatherAdaptiveGuideService
                 $coords = $cityCoords[$city->name] ?? null;
                 
                 if ($coords) {
-                    $weatherUrl = "https://api.openweathermap.org/data/2.5/weather";
-                    $weatherRes = Http::withoutVerifying()->get($weatherUrl, [
-                        'lat' => $coords[0],
-                        'lon' => $coords[1],
-                        'appid' => $openWeatherKey,
-                        'units' => 'metric'
-                    ]);
+                    if ($isFutureDate) {
+                        $weatherUrl = "https://api.openweathermap.org/data/2.5/forecast";
+                        $weatherRes = Http::withoutVerifying()->get($weatherUrl, [
+                            'lat' => $coords[0],
+                            'lon' => $coords[1],
+                            'appid' => $openWeatherKey,
+                            'units' => 'metric'
+                        ]);
+                    } else {
+                        $weatherUrl = "https://api.openweathermap.org/data/2.5/weather";
+                        $weatherRes = Http::withoutVerifying()->get($weatherUrl, [
+                            'lat' => $coords[0],
+                            'lon' => $coords[1],
+                            'appid' => $openWeatherKey,
+                            'units' => 'metric'
+                        ]);
+                    }
                     
                     if ($weatherRes->successful()) {
                         $wData = $weatherRes->json();
-                        $mainWeather = $wData['weather'][0]['main'] ?? 'Clear';
+                        
+                        if ($isFutureDate) {
+                            $targetDateString = $dateObj->format('Y-m-d');
+                            $targetTimestamp = $dateObj->timestamp;
+                            $closestForecast = null;
+                            $minDiff = PHP_INT_MAX;
+                            
+                            foreach ($wData['list'] as $forecast) {
+                                if (str_starts_with($forecast['dt_txt'], $targetDateString)) {
+                                    $forecastTimestamp = \Carbon\Carbon::parse($forecast['dt_txt'])->timestamp;
+                                    $diff = abs($forecastTimestamp - $targetTimestamp);
+                                    
+                                    if ($diff < $minDiff) {
+                                        $minDiff = $diff;
+                                        $closestForecast = $forecast;
+                                    }
+                                }
+                            }
+                            
+                            if ($closestForecast) {
+                                $mainWeather = $closestForecast['weather'][0]['main'] ?? 'Clear';
+                                $temp = $closestForecast['main']['temp'] ?? 28;
+                                $hum = $closestForecast['main']['humidity'] ?? 70;
+                                $wind = $closestForecast['wind']['speed'] ?? 10;
+                            } else {
+                                // Fallback to normal if date not in 5 days
+                                $mainWeather = $wData['list'][0]['weather'][0]['main'] ?? 'Clear';
+                                $temp = $wData['list'][0]['main']['temp'] ?? 28;
+                                $hum = $wData['list'][0]['main']['humidity'] ?? 70;
+                                $wind = $wData['list'][0]['wind']['speed'] ?? 10;
+                            }
+                        } else {
+                            $mainWeather = $wData['weather'][0]['main'] ?? 'Clear';
+                            $temp = $wData['main']['temp'] ?? 28;
+                            $hum = $wData['main']['humidity'] ?? 70;
+                            $wind = $wData['wind']['speed'] ?? 10;
+                        }
                         
                         $weatherStatus = 'Cerah';
                         if (in_array(strtolower($mainWeather), ['rain', 'drizzle', 'thunderstorm'])) {
@@ -82,14 +135,14 @@ class WeatherAdaptiveGuideService
                         
                         $weather = $this->weatherRepo->updateWeather($cityId, [
                             'status' => $weatherStatus,
-                            'temperature' => $wData['main']['temp'] ?? 28,
-                            'humidity' => $wData['main']['humidity'] ?? 70,
-                            'wind_speed' => $wData['wind']['speed'] ?? 10
+                            'temperature' => $temp,
+                            'humidity' => $hum,
+                            'wind_speed' => $wind
                         ]);
                     }
                 }
             } catch (\Exception $e) {
-                Log::error("Failed fetching live weather for city: " . $e->getMessage());
+                Log::error("Failed fetching weather for city: " . $e->getMessage());
             }
         }
 
@@ -557,10 +610,18 @@ class WeatherAdaptiveGuideService
     /**
      * Get recommendations using absolute latitude and longitude coordinates.
      */
-    public function getRecommendationsForCoordinates($lat, $lng, $locationName = null)
+    public function getRecommendationsForCoordinates($lat, $lng, $locationName = null, $date = null)
     {
         $locationName = $locationName ?: 'Lokasi Pencarian';
         
+        $isFutureDate = false;
+        if ($date) {
+            $dateObj = \Carbon\Carbon::parse($date);
+            if ($dateObj->isFuture() && !$dateObj->isToday()) {
+                $isFutureDate = true;
+            }
+        }
+
         // 1. Get live weather from OpenWeather API using coordinates
         $weatherStatus = 'Cerah';
         $weatherTemp = 28;
@@ -575,19 +636,57 @@ class WeatherAdaptiveGuideService
             $openWeatherKey = config('services.openweather.api_key');
             if ($openWeatherKey) {
                 try {
-                    $weatherUrl = "https://api.openweathermap.org/data/2.5/weather";
+                    if ($isFutureDate) {
+                        $weatherUrl = "https://api.openweathermap.org/data/2.5/forecast";
+                    } else {
+                        $weatherUrl = "https://api.openweathermap.org/data/2.5/weather";
+                    }
+
                     $weatherRes = Http::withoutVerifying()->get($weatherUrl, [
                         'lat' => $lat,
                         'lon' => $lng,
                         'appid' => $openWeatherKey,
                         'units' => 'metric'
                     ]);
+                    
                     if ($weatherRes->successful()) {
                         $wData = $weatherRes->json();
-                        $mainWeather = $wData['weather'][0]['main'] ?? 'Clear';
-                        $weatherTemp = $wData['main']['temp'] ?? 28;
-                        $weatherHumidity = $wData['main']['humidity'] ?? 70;
-                        $weatherWind = $wData['wind']['speed'] ?? 10;
+                        
+                        if ($isFutureDate) {
+                            $targetDateString = $dateObj->format('Y-m-d');
+                            $targetTimestamp = $dateObj->timestamp;
+                            $closestForecast = null;
+                            $minDiff = PHP_INT_MAX;
+                            
+                            foreach ($wData['list'] as $forecast) {
+                                if (str_starts_with($forecast['dt_txt'], $targetDateString)) {
+                                    $forecastTimestamp = \Carbon\Carbon::parse($forecast['dt_txt'])->timestamp;
+                                    $diff = abs($forecastTimestamp - $targetTimestamp);
+                                    
+                                    if ($diff < $minDiff) {
+                                        $minDiff = $diff;
+                                        $closestForecast = $forecast;
+                                    }
+                                }
+                            }
+                            
+                            if ($closestForecast) {
+                                $mainWeather = $closestForecast['weather'][0]['main'] ?? 'Clear';
+                                $weatherTemp = $closestForecast['main']['temp'] ?? 28;
+                                $weatherHumidity = $closestForecast['main']['humidity'] ?? 70;
+                                $weatherWind = $closestForecast['wind']['speed'] ?? 10;
+                            } else {
+                                $mainWeather = $wData['list'][0]['weather'][0]['main'] ?? 'Clear';
+                                $weatherTemp = $wData['list'][0]['main']['temp'] ?? 28;
+                                $weatherHumidity = $wData['list'][0]['main']['humidity'] ?? 70;
+                                $weatherWind = $wData['list'][0]['wind']['speed'] ?? 10;
+                            }
+                        } else {
+                            $mainWeather = $wData['weather'][0]['main'] ?? 'Clear';
+                            $weatherTemp = $wData['main']['temp'] ?? 28;
+                            $weatherHumidity = $wData['main']['humidity'] ?? 70;
+                            $weatherWind = $wData['wind']['speed'] ?? 10;
+                        }
 
                         if (in_array(strtolower($mainWeather), ['rain', 'drizzle', 'thunderstorm'])) {
                             $weatherStatus = 'Hujan';
@@ -1019,6 +1118,10 @@ class WeatherAdaptiveGuideService
             'weather' => $weather,
             'reason' => $reason,
             'destinations' => $destinationsList,
+            'user' => [
+                'lat' => $lat,
+                'lng' => $lng
+            ],
             'logs' => [],
             'status_changed' => true,
             'google_maps_api_key' => $googleKey ?: ''
