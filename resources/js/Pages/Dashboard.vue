@@ -134,6 +134,12 @@ const submitWeatherSimulation = () => {
     });
 };
 
+const resetWeatherSimulation = () => {
+    router.post(route('admin.weather.reset', selectedCity.value), {}, {
+        preserveScroll: true
+    });
+};
+
 const getWeatherBg = (status) => {
     if (status === 'Hujan') return 'bg-gradient-to-br from-indigo-900 via-slate-800 to-blue-900 shadow-indigo-900/50';
     if (status === 'Berawan') return 'bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 shadow-slate-700/50';
@@ -460,13 +466,23 @@ watch(() => props.guideData?.city?.name, () => {
                                     </div>
                                 </div>
 
-                                <button 
-                                    type="submit" 
-                                    :disabled="weatherForm.processing"
-                                    class="w-full inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 px-4 py-4 text-sm font-black text-white uppercase tracking-widest shadow-lg shadow-rose-200 hover:shadow-xl hover:from-rose-600 hover:to-pink-700 transition-all active:scale-[0.98] disabled:opacity-50"
-                                >
-                                    Push Update
-                                </button>
+                                <div class="flex gap-3">
+                                    <button 
+                                        type="button" 
+                                        @click="resetWeatherSimulation"
+                                        :disabled="weatherForm.processing"
+                                        class="w-1/3 inline-flex items-center justify-center rounded-xl bg-slate-200 dark:bg-slate-700 px-4 py-4 text-sm font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest hover:bg-slate-300 dark:hover:bg-slate-600 transition-all active:scale-[0.98] disabled:opacity-50"
+                                    >
+                                        Reset
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        :disabled="weatherForm.processing"
+                                        class="w-2/3 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 px-4 py-4 text-sm font-black text-white uppercase tracking-widest shadow-lg shadow-rose-200 hover:shadow-xl hover:from-rose-600 hover:to-pink-700 transition-all active:scale-[0.98] disabled:opacity-50"
+                                    >
+                                        Push Update
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
