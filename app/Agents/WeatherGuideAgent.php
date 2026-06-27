@@ -6,11 +6,16 @@ use App\Models\Destination;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @deprecated This class is no longer used. All recommendation logic has been
+ *             migrated to App\Services\WeatherAdaptiveGuideService.
+ *             This file is kept for reference only and should be removed in a future cleanup.
+ */
 class WeatherGuideAgent
 {
     /**
      * Get weather-adaptive recommendations for a given city.
-     * 
+     *
      * The agentic logic:
      * 1. Fetch live weather data from OpenWeather API (if key is set).
      * 2. If it is raining (or simulated rain), it filters to indoor destinations.
@@ -31,21 +36,25 @@ class WeatherGuideAgent
                 'error_message' => $e->getMessage()
             ];
         }
-        
+
         $isRaining = $this->evaluateWeather($weatherData);
 
         $country = $weatherData['sys']['country'] ?? '';
         $timezoneOffset = $weatherData['timezone'] ?? 0;
         $localTime = gmdate('H:i', time() + $timezoneOffset);
-        
+
         $weatherData['formatted_time'] = $localTime;
         $weatherData['country_code'] = $country ? \Locale::getDisplayRegion('-' . $country, 'id') : '';
 
         $currentTemp = $weatherData['main']['temp'] ?? null;
 
-        // Base query with temperature checks if available
-        $query = Destination::query()->where('city', 'like', "%$city%");
-        
+        // Fix: destinations table uses city_id (FK), not a 'city' string column.
+        // Join through the cities relationship to filter by city name.
+        $query = Destination::query()
+            ->whereHas('city', function ($q) use ($city) {
+                $q->where('name', 'like', "%{$city}%");
+            });
+
         if ($currentTemp !== null) {
             $query->where(function ($q) use ($currentTemp) {
                 $q->whereNull('min_temp')
@@ -66,10 +75,15 @@ class WeatherGuideAgent
 
         // If no destinations match the exact temp criteria, fallback to any matching category
         if ($recommendations->isEmpty()) {
+            $fallbackQuery = Destination::query()
+                ->whereHas('city', function ($q) use ($city) {
+                    $q->where('name', 'like', "%{$city}%");
+                });
+
             if ($isRaining) {
-                $recommendations = Destination::indoor()->where('city', 'like', "%$city%")->get();
+                $recommendations = $fallbackQuery->where('category', 'indoor')->get();
             } else {
-                $recommendations = Destination::outdoor()->where('city', 'like', "%$city%")->get();
+                $recommendations = $fallbackQuery->where('category', 'outdoor')->get();
             }
         }
 
@@ -106,10 +120,11 @@ class WeatherGuideAgent
             'australia' => 'Canberra'
         ];
 
-        $lowerCity = strtolower(trim($city));
+        $lowerCity = strtolower(trim($city ?? ''));
         if (array_key_exists($lowerCity, $countryToCapitalMap)) {
             $city = $countryToCapitalMap[$lowerCity];
         }
+
         // Allow explicit simulation for demo purposes
         if (request()->has('force_weather')) {
             $main = request()->query('force_weather');
@@ -120,8 +135,9 @@ class WeatherGuideAgent
             ];
         }
 
-        $apiKey = env('OPENWEATHER_API_KEY');
-        
+        // Fix: use config() instead of env() so it works after config:cache
+        $apiKey = config('services.openweather.api_key');
+
         if (empty($apiKey)) {
             throw new \Exception("OpenWeather API key is missing. Please configure OPENWEATHER_API_KEY in .env");
         }
@@ -161,10 +177,10 @@ class WeatherGuideAgent
         }
 
         $condition = strtolower($weatherData['weather'][0]['main']);
-        
+
         // Define bad weather conditions
         $rainyConditions = ['rain', 'drizzle', 'thunderstorm', 'snow'];
-        
+
         return in_array($condition, $rainyConditions);
     }
 }

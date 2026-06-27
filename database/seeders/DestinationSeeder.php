@@ -13,6 +13,7 @@ class DestinationSeeder extends Seeder
     {
         // 1. Seed Cities
         $cities = [
+            ['name' => 'Batu', 'country' => 'Indonesia'],
             ['name' => 'Jakarta', 'country' => 'Indonesia'],
             ['name' => 'Malang', 'country' => 'Indonesia'],
             ['name' => 'Bandung', 'country' => 'Indonesia'],
@@ -26,6 +27,7 @@ class DestinationSeeder extends Seeder
 
         // 2. Seed Default Weather Conditions for each city
         $weatherData = [
+            'Batu' => ['status' => 'Cerah', 'temperature' => 24, 'humidity' => 70, 'wind_speed' => 8],
             'Jakarta' => ['status' => 'Cerah', 'temperature' => 31, 'humidity' => 65, 'wind_speed' => 12],
             'Malang' => ['status' => 'Hujan', 'temperature' => 22, 'humidity' => 85, 'wind_speed' => 8],
             'Bandung' => ['status' => 'Berawan', 'temperature' => 24, 'humidity' => 75, 'wind_speed' => 10],
@@ -47,6 +49,51 @@ class DestinationSeeder extends Seeder
 
         // 3. Seed Destinations linked via city_id
         $destinations = [
+            // Batu
+            [
+                'name' => 'Museum Angkut',
+                'description' => 'Museum transportasi terbesar di Asia dengan koleksi mobil antik dari berbagai penjuru dunia. Sangat nyaman dikunjungi saat hujan karena seluruh area indoor.',
+                'category' => 'indoor',
+                'city_name' => 'Batu',
+                'image_url' => 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=600',
+                'opening_hours' => '12:00 - 20:00',
+                'rating' => 4.8,
+                'min_temp' => null,
+                'max_temp' => null,
+            ],
+            [
+                'name' => 'Alun-Alun Kota Batu',
+                'description' => 'Taman bermain terbuka yang ramah keluarga dengan bianglala ikonik dan pasar kuliner malam hari. Sangat ramai dan menyenangkan saat cuaca cerah.',
+                'category' => 'outdoor',
+                'city_name' => 'Batu',
+                'image_url' => 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?q=80&w=600',
+                'opening_hours' => 'Buka 24 Jam',
+                'rating' => 4.6,
+                'min_temp' => 18,
+                'max_temp' => 30,
+            ],
+            [
+                'name' => 'Lippo Plaza Batu',
+                'description' => 'Pusat perbelanjaan ber-AC yang nyaman dengan gerai ritel modern, restoran, bioskop, dan area bermain anak. Pilihan utama saat hujan.',
+                'category' => 'indoor',
+                'city_name' => 'Batu',
+                'image_url' => 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=600',
+                'opening_hours' => '10:00 - 22:00',
+                'rating' => 4.3,
+                'min_temp' => null,
+                'max_temp' => null,
+            ],
+            [
+                'name' => 'Coban Rondo Waterfall',
+                'description' => 'Wisata air terjun alam terbuka yang menawan di lereng gunung. Sangat indah saat cerah namun tidak disarankan saat hujan deras.',
+                'category' => 'outdoor',
+                'city_name' => 'Batu',
+                'image_url' => 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=600',
+                'opening_hours' => '07:00 - 17:00',
+                'rating' => 4.5,
+                'min_temp' => 15,
+                'max_temp' => 28,
+            ],
             // Jakarta
             [
                 'name' => 'Taman Impian Jaya Ancol',

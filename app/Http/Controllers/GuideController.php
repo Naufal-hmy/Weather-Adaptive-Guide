@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Services\WeatherAdaptiveGuideService;
 use App\Repositories\Contracts\CityRepositoryInterface;
 use App\Repositories\Contracts\DestinationRepositoryInterface;
+use App\Traits\CalculatesDistance;
 use Inertia\Inertia;
 
 class GuideController extends Controller
 {
+    use CalculatesDistance;
     protected $guideService;
     protected $cityRepo;
     protected $destinationRepo;
@@ -61,7 +65,7 @@ class GuideController extends Controller
             'cities' => $cities,
             'selectedCityId' => $selectedCityId ? (int) $selectedCityId : null,
             'guideData' => $guideData,
-            'googleMapsApiKey' => env('GOOGLE_MAPS_API_KEY') ?: '',
+            'googleMapsApiKey' => config('services.google.maps_api_key') ?: '',
             'stats' => [
                 'indoor' => $indoorCount,
                 'outdoor' => $outdoorCount
@@ -98,7 +102,7 @@ class GuideController extends Controller
     public function smartMap()
     {
         $cities = $this->cityRepo->all();
-        $googleMapsApiKey = env('GOOGLE_MAPS_API_KEY') ?: '';
+        $googleMapsApiKey = config('services.google.maps_api_key') ?: '';
 
         return Inertia::render('SmartMap', [
             'cities' => $cities,
@@ -199,7 +203,7 @@ class GuideController extends Controller
             $weatherStatus = $forceWeather;
             $weatherTemp = $forceWeather === 'Hujan' ? 22 : ($forceWeather === 'Berawan' ? 25 : 29);
         } else {
-            $openWeatherKey = env('OPENWEATHER_API_KEY');
+            $openWeatherKey = config('services.openweather.api_key');
             if ($openWeatherKey) {
                 try {
                     $weatherUrl = "https://api.openweathermap.org/data/2.5/weather";
@@ -241,7 +245,7 @@ class GuideController extends Controller
         }
 
         // 2. Cari destinasi indoor/alternatif terdekat menggunakan Google Places API / Fallback
-        $googleKey = env('GOOGLE_MAPS_API_KEY');
+        $googleKey = config('services.google.maps_api_key');
         $rawPlaces = [];
 
         if ($googleKey) {
@@ -562,16 +566,4 @@ class GuideController extends Controller
         ]);
     }
 
-    /**
-     * Helper distance calculator (Haversine formula)
-     */
-    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
-    {
-        $earthRadius = 6371; // in km
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLon = deg2rad($lon2 - $lon1);
-        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        return round($earthRadius * $c, 1);
-    }
 }
