@@ -163,10 +163,6 @@ const submit = () => {
             <!-- Content overlay -->
             <div class="relative z-10 flex flex-col justify-end p-16 w-full h-full">
                 <div class="max-w-md">
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-white/90">AI-Powered</span>
-                    </div>
                     <h1 class="text-4xl md:text-5xl font-black text-white leading-tight mb-4 drop-shadow-lg">
                         Jelajahi dunia dengan rekomendasi cerdas.
                     </h1>
